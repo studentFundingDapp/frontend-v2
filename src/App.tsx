@@ -7,7 +7,7 @@ import Home from "./pages/Home";
 
 // Import components
 import Footer from "./components/Footer";
-import Loader from "./components/Loader";
+// import Loader from "./components/Loader";
 import NavBar from "./components/NavBar";
 
 const App: React.FC = () => {
@@ -16,7 +16,7 @@ const App: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Show Loader when loading */}
-      {loading && <Loader />}
+      {/* loading && <Loader /> */}
 
       {/* NavBar */}
       <NavBar />
