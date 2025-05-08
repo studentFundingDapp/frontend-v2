@@ -47,14 +47,13 @@ export const LoadingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         <>
           <Progress 
             value={progress} 
-            className="fixed top-0 left-0 right-0 z-50 h-1 bg-blue-100" 
-            style={{ backgroundColor: "rgb(37, 99, 235)" }}
+            className="fixed top-0 left-0 right-0 z-50 h-1 bg-blue-100 dark:bg-blue-900" 
           />
-          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40 flex flex-col items-center justify-center">
-            <div className="bg-white rounded-xl p-6 shadow-2xl flex flex-col items-center max-w-sm w-full">
-              <Loader className="h-10 w-10 text-blue-600 animate-spin mb-4" />
-              <p className="text-blue-900 font-medium">Loading DSFS Platform...</p>
-              <p className="text-blue-600 text-sm mt-1">{Math.round(progress)}%</p>
+          <div className="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm z-40 flex flex-col items-center justify-center">
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-2xl flex flex-col items-center max-w-sm w-full">
+              <Loader className="h-10 w-10 text-blue-600 dark:text-blue-400 animate-spin mb-4" />
+              <p className="text-blue-900 dark:text-blue-100 font-medium">Loading DSFS Platform...</p>
+              <p className="text-blue-600 dark:text-blue-400 text-sm mt-1">{Math.round(progress)}%</p>
             </div>
           </div>
         </>
@@ -71,4 +70,3 @@ export const useLoading = () => {
   }
   return context;
 };
-export default LoadingContext;

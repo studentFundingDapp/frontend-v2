@@ -1,168 +1,257 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
-import React, { useEffect, useState } from "react";
-import ReactDOM from "react-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
-import CommentModal from "./CommentModal";
+import { Card } from "./ui/card";
+import { Heart, MessageSquare, Share2, Bookmark } from "lucide-react";
+import { Badge } from "./ui/badge";
+import { cn } from "../lib/utils";
 
 interface Comment {
   user: string;
   text: string;
-  avatar?: string;
+}
+
+interface StudentDetails {
+  name: string;
+  degree?: string;
+  university?: string;
+  avatarUrl?: string;
 }
 
 interface ProjectCardProps {
-  avatarUrl: string;
   projectName: string;
-  username: string;
+  description: string;
+  imageUrl?: string;
   timestamp: string;
   location?: string;
-  imageUrl: string;
-  description: string;
-  tags: string[];
+  tags?: string[];
   likesCount: number;
-  comments: Comment[];
+  comments?: Comment[];
+  student?: StudentDetails;
+  buttonText?: string;
 }
 
 const ProjectCard: React.FC<ProjectCardProps> = ({
-  avatarUrl,
   projectName,
-  username,
+  description,
+  imageUrl,
   timestamp,
   location,
-  imageUrl,
-  description,
-  tags,
-  likesCount,
-  comments,
+  tags = [],
+  likesCount = 0,
+  comments = [],
+  student,
+  buttonText = "View Project",
 }) => {
   const [liked, setLiked] = useState(false);
-  const [isCommentOpen, setIsCommentOpen] = useState(false);
-  const [newComments, setNewComments] = useState(comments);
-  const [loading, setLoading] = useState(true);
+  const [saved, setSaved] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [currentLikes, setCurrentLikes] = useState(likesCount);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
+  // Handle like toggle
+  const handleLike = () => {
+    setLiked(!liked);
+    setCurrentLikes(liked ? currentLikes - 1 : currentLikes + 1);
+  };
 
-  const handleAddComment = (text: string) => {
-    setNewComments((prev) => [...prev, { user: "You", text }]);
+  // Handle save toggle
+  const handleSave = () => {
+    setSaved(!saved);
+  };
+
+  // Handle share
+  const handleShare = () => {
+    // In a real app, this would open a share dialog or copy a link
+    alert("Share functionality would open here");
+  };
+
+  // Handle comment
+  const handleComment = () => {
+    // In a real app, this would open a comment modal or focus a comment input
+    alert("Comment functionality would open here");
+  };
+
+  // Get student initials for avatar fallback
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
+  };
+
+  // Truncate description
+  const truncateDescription = (text: string, maxLength: number) => {
+    if (text.length <= maxLength) return text;
+    return expanded ? text : `${text.substring(0, maxLength)}...`;
   };
 
   return (
-    <>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 space-y-6 max-w-md w-full hover:shadow-xl transition-shadow duration-300 border border-gray-200 dark:border-gray-700 relative z-10"
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img
-              src={avatarUrl}
-              alt="avatar"
-              className="w-12 h-12 rounded-full object-cover border-2 border-blue-500"
-            />
-            <div>
-              <p className="font-semibold text-gray-800 dark:text-gray-200">
-                {username || projectName}
-              </p>
-              <p className="text-xs text-gray-500">{timestamp}</p>
+    <Card className="overflow-hidden border border-gray-200 bg-white transition-all duration-300 hover:shadow-md max-w-md w-full mx-auto">
+      {/* Card Header */}
+      <div className="p-4 flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <Avatar className="h-10 w-10 border border-gray-200">
+            <AvatarImage src={student?.avatarUrl} alt={student?.name || projectName} />
+            <AvatarFallback className="bg-blue-100 text-blue-800">
+              {student ? getInitials(student.name) : projectName[0].toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          
+          <div>
+            <div className="flex items-center">
+              <h3 className="font-semibold text-sm">{student?.name || projectName}</h3>
+              {location && (
+                <span className="mx-1 text-gray-500 text-xs">•</span>
+              )}
+              {location && (
+                <Badge variant="outline" className="text-xs font-normal px-1.5 py-0 h-5">
+                  {location}
+                </Badge>
+              )}
             </div>
+            {student && (
+              <p className="text-xs text-gray-500">
+                {student.degree}{student.university && `, ${student.university}`}
+              </p>
+            )}
           </div>
-          {location && (
-            <span className="text-xs bg-blue-100 text-blue-600 px-3 py-1 rounded-full">
-              {location}
-            </span>
-          )}
         </div>
-
-        {/* Image */}
-        <div className="relative">
-          <img
-            src={imageUrl}
-            alt="project"
-            className="w-full aspect-square object-cover rounded-lg hover:scale-105 transition-transform duration-300"
+        
+        <span className="text-xs text-gray-500">{timestamp}</span>
+      </div>
+      
+      {/* Media Content */}
+      <div className="aspect-square overflow-hidden bg-gray-100 relative">
+        {imageUrl ? (
+          <motion.img 
+            src={imageUrl} 
+            alt={projectName} 
+            className="w-full h-full object-cover"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.3 }}
           />
-        </div>
-
-        {/* Actions */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              onClick={() => setLiked(!liked)}
-              className="text-gray-600 dark:text-gray-300 hover:text-blue-500"
-            >
-              {liked ? "💖" : "🤍"} {likesCount + (liked ? 1 : 0)}
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => setIsCommentOpen(true)}
-              className="text-gray-600 dark:text-gray-300 hover:text-blue-500"
-            >
-              💬 Comment
-            </Button>
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-50">
+            <span className="text-4xl font-bold text-blue-300">{projectName[0]}</span>
           </div>
-          <Button
-            variant="ghost"
-            className="text-gray-600 dark:text-gray-300 hover:text-blue-500"
+        )}
+      </div>
+      
+      {/* Action Buttons */}
+      <div className="p-4 flex items-center justify-between border-b border-gray-100">
+        <div className="flex space-x-4">
+          <motion.button 
+            className="focus:outline-none" 
+            onClick={handleLike}
+            whileTap={{ scale: 1.2 }}
           >
-            📤 Share
-          </Button>
+            <Heart 
+              className={cn("h-6 w-6 transition-colors", 
+                liked ? "fill-red-500 text-red-500" : "text-gray-700"
+              )} 
+            />
+          </motion.button>
+          
+          <motion.button 
+            className="focus:outline-none" 
+            onClick={handleComment}
+            whileTap={{ scale: 1.2 }}
+          >
+            <MessageSquare className="h-6 w-6 text-gray-700" />
+          </motion.button>
+          
+          <motion.button 
+            className="focus:outline-none" 
+            onClick={handleShare}
+            whileTap={{ scale: 1.2 }}
+          >
+            <Share2 className="h-6 w-6 text-gray-700" />
+          </motion.button>
         </div>
-
-        {/* Description */}
-        <div className="text-sm text-gray-700 dark:text-gray-300">
-          <p>
-            <span className="font-semibold">{username || projectName}</span>{" "}
-            {description.length > 200
-              ? `${description.slice(0, 200)}...`
-              : description}
-          </p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {tags.map((tag, i) => (
-              <span
-                key={i}
-                className="bg-blue-100 text-blue-600 text-xs font-medium px-2 py-1 rounded-full"
-              >
-                #{tag}
+        
+        <motion.button 
+          className="focus:outline-none" 
+          onClick={handleSave}
+          whileTap={{ scale: 1.2 }}
+        >
+          <Bookmark 
+            className={cn("h-6 w-6 transition-colors", 
+              saved ? "fill-blue-500 text-blue-500" : "text-gray-700"
+            )} 
+          />
+        </motion.button>
+      </div>
+      
+      {/* Likes Count */}
+      <div className="px-4 pt-2">
+        <p className="font-semibold text-sm">{currentLikes} {currentLikes === 1 ? 'like' : 'likes'}</p>
+      </div>
+      
+      {/* Description */}
+      <div className="px-4 py-2">
+        <p className="text-sm">
+          <span className="font-semibold">{projectName} </span>
+          {truncateDescription(description, 100)}
+          
+          {description.length > 100 && !expanded && (
+            <button 
+              className="text-gray-500 ml-1 focus:outline-none" 
+              onClick={() => setExpanded(true)}
+            >
+              more
+            </button>
+          )}
+        </p>
+        
+        {/* Tags */}
+        {tags.length > 0 && (
+          <div className="mt-2 flex flex-wrap">
+            {tags.map((tag, index) => (
+              <span key={index} className="text-blue-600 text-sm mr-1">
+                #{tag.replace(/\s+/g, '')}
               </span>
             ))}
           </div>
-        </div>
-
-        {/* Comment Preview */}
-        {newComments.length > 0 && (
-          <div className="text-sm text-gray-700 dark:text-gray-300">
-            <p
-              className="text-xs text-blue-500 cursor-pointer mt-1"
-              onClick={() => setIsCommentOpen(true)}
-            >
-              View all {newComments.length} comments
+        )}
+      </div>
+      
+      {/* Comments */}
+      {comments.length > 0 && (
+        <div className="px-4 py-2">
+          {comments.length > 2 && (
+            <button className="text-gray-500 text-sm block mb-2 focus:outline-none">
+              View all {comments.length} comments
+            </button>
+          )}
+          
+          {comments.slice(0, 2).map((comment, index) => (
+            <p key={index} className="text-sm mb-1">
+              <span className="font-semibold">{comment.user} </span>
+              {comment.text}
             </p>
-          </div>
-        )}
-
-        {/* Timestamp */}
-        <p className="text-xs text-gray-500">Posted {timestamp}</p>
-      </motion.div>
-
-      {/* Comment Modal */}
-      {isCommentOpen &&
-        ReactDOM.createPortal(
-          <CommentModal
-            isOpen={isCommentOpen}
-            onClose={() => setIsCommentOpen(false)}
-            comments={newComments}
-            onAddComment={handleAddComment}
-            className="z-50 fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
-          />,
-          document.body
-        )}
-    </>
+          ))}
+        </div>
+      )}
+      
+      {/* Timestamp */}
+      <div className="px-4 pb-3 pt-1">
+        <p className="text-gray-500 text-xs uppercase tracking-wide">
+          Posted {timestamp}
+        </p>
+      </div>
+      
+      {/* View Project Button */}
+      <div className="px-4 pb-4">
+        <Button 
+          variant="outline" 
+          className="w-full text-blue-700 border-blue-700 hover:bg-blue-50"
+        >
+          {buttonText}
+        </Button>
+      </div>
+    </Card>
   );
 };
 

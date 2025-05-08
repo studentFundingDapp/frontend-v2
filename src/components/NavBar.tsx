@@ -1,121 +1,205 @@
 // src/components/NavBar.tsx
 import { motion } from "framer-motion";
+import { FileText, Home, Info, Menu, User, Users, X } from "lucide-react";
 import { useState } from "react";
-import { FaBook, FaHome, FaInfoCircle, FaUser, FaUsers } from "react-icons/fa"; // Import icons
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import { ThemeToggle } from "../context/ThemeProvider";
 
 const NavBar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Toggle mobile menu visibility
-  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
 
   return (
     <motion.header
-      className="bg-gray-900 text-white p-5 shadow-md w-full fixed top-0 z-50"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      className="sticky top-0 z-30 w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800"
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
-        {/* Branding */}
-        <div className="flex items-center space-x-3">
-        <Link to="/" className="font-extrabold text-3xl text-blue-500">
-          DSFS
-        </Link>
-        <div className="h-8 w-1 bg-yellow-500"></div>
-        <div className="text-sm text-gray-400 leading-tight">
-          Decentralised Student <br /> Funding System
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo and Tagline */}
+          <div className="flex items-center space-x-3">
+            <NavLink
+              to="/"
+              className="flex-shrink-0 font-bold text-xl text-blue-700 dark:text-blue-400"
+            >
+              DSFS
+            </NavLink>
+            <div className="hidden md:block h-8 w-1 bg-yellow-500"></div>
+            <div className="hidden md:block text-sm text-gray-400 leading-tight">
+              Decentralised Student <br /> Funding System
+            </div>
+          </div>
+
+          {/* Mobile Logo and Tagline Centered */}
+          <div className="md:hidden flex flex-col items-center">
+            <NavLink
+              to="/"
+              className="font-bold text-xs text-blue-700 dark:text-blue-400"
+            >
+              Decentralized Student
+            </NavLink>
+            <p className="text-xs text-gray-400">Funding System</p>
+          </div>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-6">
+            {/* Theme Toggle Button */}
+            <ThemeToggle />
+
+            <NavLink
+              to="/dashboard"
+              className={({ isActive }) =>
+                `relative flex items-center text-gray-700 dark:text-gray-200 font-medium hover:text-blue-600 dark:hover:text-blue-400 ${
+                  isActive ? "text-blue-600 dark:text-blue-400 underline" : ""
+                }`
+              }
+            >
+              <Home className="h-4 w-4 mr-2" />
+              Dashboard
+            </NavLink>
+            <NavLink
+              to="/projects"
+              className={({ isActive }) =>
+                `relative flex items-center text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 ${
+                  isActive ? "text-blue-600 dark:text-blue-400 underline" : ""
+                }`
+              }
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              Projects
+            </NavLink>
+            <NavLink
+              to="/funders"
+              className={({ isActive }) =>
+                `relative flex items-center text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 ${
+                  isActive ? "text-blue-600 dark:text-blue-400 underline" : ""
+                }`
+              }
+            >
+              <Users className="h-4 w-4 mr-2" />
+              Funders
+            </NavLink>
+            <NavLink
+              to="/about"
+              className={({ isActive }) =>
+                `relative flex items-center text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 ${
+                  isActive ? "text-blue-600 dark:text-blue-400 underline" : ""
+                }`
+              }
+            >
+              <Info className="h-4 w-4 mr-2" />
+              About
+            </NavLink>
+            {/* Profile Icon */}
+            <NavLink
+              to="/profile"
+              className={({ isActive }) =>
+                `relative flex items-center text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 ${
+                  isActive ? "text-blue-600 dark:text-blue-400 underline" : ""
+                }`
+              }
+            >
+              <User className="h-6 w-6 mr-2" />
+              profile
+            </NavLink>
+          </div>
+
+          {/* Mobile Menu Toggle */}
+          <div className="md:hidden flex items-center space-x-4">
+            {/* Theme Toggle Button */}
+            <div className="flex justify-center">
+              <ThemeToggle />
+            </div>
+            {/* Profile Icon */}
+            <NavLink
+              to="/profile"
+              className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+            >
+              <User className="h-6 w-6" />
+            </NavLink>
+
+            <button
+              onClick={toggleMobileMenu}
+              className="text-gray-500 dark:text-gray-400"
+            >
+              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Navigation */}
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden mt-2 space-y-2 bg-white dark:bg-gray-900 rounded-lg shadow-md p-4"
+          >
+            <NavLink
+              to="/dashboard"
+              className={({ isActive }) =>
+                `block flex items-center text-gray-700 dark:text-gray-200 font-medium hover:text-blue-600 dark:hover:text-blue-400 ${
+                  isActive ? "text-blue-600 dark:text-blue-400 underline" : ""
+                }`
+              }
+            >
+              <Home className="h-4 w-4 mr-2" />
+              Dashboard
+            </NavLink>
+            <NavLink
+              to="/projects"
+              className={({ isActive }) =>
+                `block flex items-center text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 ${
+                  isActive ? "text-blue-600 dark:text-blue-400 underline" : ""
+                }`
+              }
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              Projects
+            </NavLink>
+            <NavLink
+              to="/funders"
+              className={({ isActive }) =>
+                `block flex items-center text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 ${
+                  isActive ? "text-blue-600 dark:text-blue-400 underline" : ""
+                }`
+              }
+            >
+              <Users className="h-4 w-4 mr-2" />
+              Funders
+            </NavLink>
+            <NavLink
+              to="/about"
+              className={({ isActive }) =>
+                `block flex items-center text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 ${
+                  isActive ? "text-blue-600 dark:text-blue-400 underline" : ""
+                }`
+              }
+            >
+              <Info className="h-4 w-4 mr-2" />
+              About
+            </NavLink>
+            <NavLink
+              to="/profile"
+              className={({ isActive }) =>
+                `block flex items-center text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 ${
+                  isActive ? "text-blue-600 dark:text-blue-400 underline" : ""
+                }`
+              }
+            >
+              <User className="h-4 w-4 mr-2" />
+              Profile
+            </NavLink>
+
+            
+          </motion.div>
+        )}
       </div>
-
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex space-x-6">
-          <Link
-            to="/"
-            className="flex items-center text-gray-300 hover:text-blue-500 transition duration-300"
-          >
-            <FaHome className="mr-2" /> Home
-          </Link>
-          <Link
-            to="/posts"
-            className="flex items-center text-gray-300 hover:text-blue-500 transition duration-300"
-          >
-            <FaBook className="mr-2" /> Posts
-          </Link>
-          <Link
-            to="/funders"
-            className="flex items-center text-gray-300 hover:text-blue-500 transition duration-300"
-          >
-            <FaUsers className="mr-2" /> Funders
-          </Link>
-          <Link
-            to="/about"
-            className="flex items-center text-gray-300 hover:text-blue-500 transition duration-300"
-          >
-            <FaInfoCircle className="mr-2" /> About
-          </Link>
-          <Link
-            to="/profile"
-            className="flex items-center text-gray-300 hover:text-blue-500 transition duration-300"
-          >
-            <FaUser className="mr-2" /> Profile
-          </Link>
-        </nav>
-
-        {/* Mobile Menu Button */}
-        <div className="md:hidden">
-          <button onClick={toggleMobileMenu} className="text-gray-300">
-            ☰
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <motion.div
-          className="md:hidden bg-gray-800 p-5 absolute top-full left-0 w-full"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-        >
-          <Link
-            to="/"
-            className="flex items-center text-gray-300 hover:text-blue-500 py-2"
-            onClick={toggleMobileMenu}
-          >
-            <FaHome className="mr-2" /> Home
-          </Link>
-          <Link
-            to="/posts"
-            className="flex items-center text-gray-300 hover:text-blue-500 py-2"
-            onClick={toggleMobileMenu}
-          >
-            <FaBook className="mr-2" /> Posts
-          </Link>
-          <Link
-            to="/funders"
-            className="flex items-center text-gray-300 hover:text-blue-500 py-2"
-            onClick={toggleMobileMenu}
-          >
-            <FaUsers className="mr-2" /> Funders
-          </Link>
-          <Link
-            to="/about"
-            className="flex items-center text-gray-300 hover:text-blue-500 py-2"
-            onClick={toggleMobileMenu}
-          >
-            <FaInfoCircle className="mr-2" /> About
-          </Link>
-          <Link
-            to="/profile"
-            className="flex items-center text-gray-300 hover:text-blue-500 py-2"
-            onClick={toggleMobileMenu}
-          >
-            <FaUser className="mr-2" /> Profile
-          </Link>
-        </motion.div>
-      )}
     </motion.header>
   );
 };

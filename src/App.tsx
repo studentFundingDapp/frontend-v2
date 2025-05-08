@@ -1,37 +1,35 @@
-// src/App.tsx
-import { Route, Routes } from "react-router-dom";
-import { useLoading } from "./context/LoadingContext";
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import Footer from './components/Footer';
+import { Toaster } from './components/ui/toaster';
+import { LoadingProvider } from './context/LoadingContext';
+import { ThemeProvider } from './context/ThemeProvider';
+import Dashboard from './pages/Dashboard';
+import NotFound from './pages/NotFound';
+import NavBar from './components/NavBar';
 
-// Import pages
-import Home from "./pages/Home";
-
-// Import components
-import Footer from "./components/Footer";
-// import Loader from "./components/Loader";
-import NavBar from "./components/NavBar";
-
-const App: React.FC = () => {
-  const { loading } = useLoading(); // Access loading state
-
+function App() {
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Show Loader when loading */}
-      {/* loading && <Loader /> */}
-
-      {/* NavBar */}
-      <NavBar />
-
-      {/* Main Content */}
-      <main className="flex-grow">
-        <Routes>
-          <Route path="/" element={<Home />} />
-        </Routes>
-      </main>
-
-      {/* Footer */}
-      <Footer />
-    </div>
+    <ThemeProvider>
+      <LoadingProvider>
+        <Router>
+        <NavBar />
+          <div className="flex flex-col min-h-screen">
+            <div className="flex-grow">
+            
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="*" element={<NotFound />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                
+              </Routes>
+            </div>
+            <Footer />
+          </div>
+        </Router>
+        <Toaster />
+      </LoadingProvider>
+    </ThemeProvider>
   );
-};
+}
 
 export default App;
