@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
-import { Button } from "../components/ui/button";
+import { Button } from "./ui/button";
 import CommentModal from "./CommentModal";
 
 interface Comment {
