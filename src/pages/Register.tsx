@@ -13,7 +13,9 @@ import { Input } from "../components/ui/input";
 const registerSchema = z.object({
   username: z.string().min(3, "Username is required"),
   email: z.string().email("Enter a valid email"),
-  role: z.enum(["student", "donor"], { message: "Select a valid role" }),
+  full_name: z.string().min(3, "Full name is required"),
+  wallet_address: z.string().min(10, "Wallet address is required"),
+  role: z.enum(["student", "donor", "admin"], { message: "Select a valid role" }),
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string().min(6, "Password must be at least 6 characters"),
   terms: z.boolean().refine(val => val === true, {
@@ -28,6 +30,7 @@ type RegisterValues = z.infer<typeof registerSchema>;
 
 const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
+  // Removed unused apiError state
   const navigate = useNavigate();
 
   const form = useForm<RegisterValues>({
@@ -35,6 +38,8 @@ const Register = () => {
     defaultValues: {
       username: "",
       email: "",
+      full_name: "",
+      wallet_address: "",
       role: "student", // default selected option
       password: "",
       confirmPassword: "",
@@ -45,42 +50,51 @@ const Register = () => {
   const onSubmit = async (data: RegisterValues) => {
     setIsLoading(true);
     setApiError(null);
-    
+
     try {
+      // Log the request payload for debugging
+    console.log("Request payload:", {
+      email: data.email,
+      username: data.username,
+      password: data.password,
+      full_name: data.full_name,
+      wallet_address: data.wallet_address,
+      role: data.role,
+    });
       // Call the API to register the user
-      const response = await fetch('https://studybae.online:8000/api/auth/register', {
-        method: 'POST',
+      const response = await fetch("http://studybae.online:8000/api/auth/signup", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: data.username,
           email: data.email,
-          role: data.role,
+          username: data.username,
           password: data.password,
-          
+          full_name: data.full_name,
+          wallet_address: data.wallet_address,
+          role: data.role,
         }),
-        credentials: 'same-origin',
-        mode: 'cors',
       });
-      
+
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: 'Registration failed' }));
-        throw new Error(errorData.message || 'Registration failed');
+        const errorData = await response.json().catch(() => ({ message: "Registration failed" }));
+        console.error("Backend error response:", errorData);
+        throw new Error(errorData.message || "Registration failed");
       }
-      
-      const result = await response.json();
-      
+
+      await response.json();
+
       // Show success message
       toast.success("Registration successful! Please login with your credentials");
-      
+
       // Redirect to login after registration
       setTimeout(() => navigate("/login"), 1000);
     } catch (error) {
-      console.error('Registration error:', error);
-      
+      console.error("Registration error:", error);
+
       // Check if it's a network error
-      if (error instanceof TypeError && error.message === 'Failed to fetch') {
+      if (error instanceof TypeError && error.message === "Failed to fetch") {
         setApiError("Unable to connect to the server. Please check your internet connection or try using HTTP instead of HTTPS.");
         toast.error("Connection error. Server may be unavailable.");
       } else {
@@ -91,46 +105,6 @@ const Register = () => {
       setIsLoading(false);
     }
   };
-
-  // Alternative HTTP version of the registration function
-  const tryAlternativeRegister = async (data: RegisterValues) => {
-    setIsLoading(true);
-    setApiError(null);
-    
-    try {
-      const response = await fetch('http://studybae.online:8000/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: data.username,
-          email: data.email,
-          role: data.role,
-          password: data.password,
-          confirmPassword: data.confirmPassword,
-        }),
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: 'Registration failed' }));
-        throw new Error(errorData.message || 'Registration failed');
-      }
-      
-      const result = await response.json();
-      
-      toast.success("Registration successful! Please login with your credentials");
-      setTimeout(() => navigate("/login"), 1000);
-    } catch (error) {
-      console.error('Alternative registration error:', error);
-      toast.error("Failed to register with alternative method. Please try again later.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-
-  
 
   return (
     <AuthLayout2>
@@ -171,32 +145,53 @@ const Register = () => {
               </FormItem>
             )}
           />
-
-            <FormField
-              control={form.control}
-              name="role"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Role</FormLabel>
-                  <FormControl>
-                    <select
-                      {...field}
-                      disabled={isLoading}
-                      className="w-full border border-gray-300 rounded-md p-2 dark:bg-gray-800 dark:text-white"
-                    >
-                      <option value="student">Student</option>
-                      <option value="donor">Donor</option>
-                      {/* "admin" if the backend accepts it */}
-                      <option value="admin">Admin</option>
-                    </select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-
-
+          <FormField
+            control={form.control}
+            name="full_name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Full Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="John Doe" disabled={isLoading} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="wallet_address"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Wallet Address</FormLabel>
+                <FormControl>
+                  <Input placeholder="0x123456789abcdef" disabled={isLoading} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="role"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Role</FormLabel>
+                <FormControl>
+                  <select
+                    {...field}
+                    disabled={isLoading}
+                    className="w-full border border-gray-300 rounded-md p-2 dark:bg-gray-800 dark:text-white"
+                  >
+                    <option value="student">Student</option>
+                    <option value="donor">Donor</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="password"
@@ -210,7 +205,6 @@ const Register = () => {
               </FormItem>
             )}
           />
-
           <FormField
             control={form.control}
             name="confirmPassword"
@@ -224,7 +218,6 @@ const Register = () => {
               </FormItem>
             )}
           />
-
           <FormField
             control={form.control}
             name="terms"
@@ -249,7 +242,6 @@ const Register = () => {
               </FormItem>
             )}
           />
-
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? "Creating account..." : "Create account"}
           </Button>
@@ -269,3 +261,8 @@ const Register = () => {
 };
 
 export default Register;
+
+function setApiError(arg0: string | null) {
+  console.error(arg0); // Log the error for debugging
+}
+

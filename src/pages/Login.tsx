@@ -31,7 +31,7 @@ const Login = ({ setIsAuthenticated }: { setIsAuthenticated: React.Dispatch<Reac
   const onSubmit = async (data: LoginValues) => {
     setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/auth/register", {
+      const res = await fetch("http://studybae.online:8000/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -55,7 +55,8 @@ const Login = ({ setIsAuthenticated }: { setIsAuthenticated: React.Dispatch<Reac
       toast.success("Login successful!");
       setTimeout(() => navigate("/dashboard"), 1000);
     } catch (error: unknown) {
-      toast.error(error.message || "Failed to login. Please check your credentials.");
+      const errorMessage = error instanceof Error ? error.message : "Failed to login. Please check your credentials.";
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

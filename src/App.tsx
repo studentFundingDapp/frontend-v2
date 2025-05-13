@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Navigate, Route, BrowserRouter as Router, Routes, useLocation } from "react-router-dom";
 import Footer from "./components/Footer";
 import NavBar from "./components/NavBar";
-import ProtectedRoute from "./components/ProtectedRoute";
 import { Toaster } from "./components/ui/toaster";
 import { LoadingProvider } from "./context/LoadingContext";
 import { ThemeProvider } from "./context/ThemeProvider";
@@ -28,7 +27,6 @@ function App() {
 }
 
 function AppContent({
-  isAuthenticated,
   setIsAuthenticated,
 }: {
   isAuthenticated: boolean;
@@ -60,10 +58,13 @@ function AppContent({
               <Route path="/" element={<Navigate to="/login" replace />} />
               <Route path="/projects" element={<Projects />} />
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="*" element={<NotFound />} />
+              
             </Routes>
           </div>
           <Footer />
+            <Routes>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
         </>
       )}
     </div>

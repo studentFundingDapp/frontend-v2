@@ -80,7 +80,7 @@ export default function Index() {
   
   return (
     <PageWrapper>
-      {/* Navigation Bar */}
+      
       
       <main className="bg-gray-50 dark:bg-gray-900 min-h-screen">
         {/* Welcome Banner */}
