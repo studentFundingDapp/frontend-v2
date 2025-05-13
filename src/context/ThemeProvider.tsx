@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { Moon, Sun } from "lucide-react";
 
 type Theme = "dark" | "light";
@@ -11,6 +12,15 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Wrap the children with NextThemesProvider first, then our custom ThemeProvider
+  return (
+    <NextThemesProvider attribute="class" defaultTheme="system" enableSystem>
+      <CustomThemeProvider>{children}</CustomThemeProvider>
+    </NextThemesProvider>
+  );
+};
+
+const CustomThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>(() => {
     // Check for saved theme in localStorage or use system preference
     const savedTheme = localStorage.getItem("theme");

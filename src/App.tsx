@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Register from "./pages/Register";
+import Projects from "./pages/Projects"; // Ensure the file exists at this path
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false); // Track authentication state
@@ -57,14 +58,8 @@ function AppContent({
           <div className="flex-grow">
             <Routes>
               <Route path="/" element={<Navigate to="/login" replace />} />
-              <Route
-                path="/dashboard"
-                element={
-                  //<ProtectedRoute isAuthenticated={isAuthenticated}>
-                    <Dashboard />
-                  //</ProtectedRoute>
-                }
-              />
+              <Route path="/projects" element={<Projects />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>

@@ -63,7 +63,7 @@ const NavBar: React.FC = () => {
               Dashboard
             </NavLink>
             <NavLink
-              to="/projects"
+              to="/project"
               className={({ isActive }) =>
                 `relative flex items-center text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 ${
                   isActive ? "text-blue-600 dark:text-blue-400 underline" : ""
