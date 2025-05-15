@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useState } from "react";
 import { Wallet } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { useToast } from "../hooks/use-toast";
@@ -28,6 +29,8 @@ export default function Index() {
       duration: 3000,
     });
   };
+
+  const [showBanner, setShowBanner] = useState(true);
 
   // Mock transaction data
   const recentTransactions = [
@@ -84,14 +87,36 @@ export default function Index() {
       
       <main className="bg-gray-50 dark:bg-gray-900 min-h-screen">
         {/* Welcome Banner */}
-        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 py-3">
+        {/* <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 py-3">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between">
               <p className="text-sm dark:text-gray-300">Welcome back! Your Stellar wallet is <span className="text-blue-600 dark:text-blue-400 font-medium">ready for transactions</span></p>
               <Button size="sm" variant="ghost" className="text-xs">Dismiss</Button>
             </div>
           </div>
-        </div>
+        </div> */}
+
+{/* to set the dismiss button to make the welcome message disappear */}
+        {showBanner && (
+  <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 py-3">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="flex items-center justify-between">
+        <p className="text-sm dark:text-gray-300">
+          Welcome back! Your <span className="text-blue-600 dark:text-blue-400 font-medium">donation wallet</span> is active.
+        </p>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="text-xs"
+          onClick={() => setShowBanner(false)}
+        >
+          Dismiss
+        </Button>
+      </div>
+    </div>
+  </div>
+)}
+
 
         {/* Dashboard Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
