@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Register from "./pages/Register";
 import Projects from "./pages/Projects"; // Ensure the file exists at this path
+import Donate from "./pages/Donate";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false); // Track authentication state
@@ -58,6 +59,7 @@ function AppContent({
               <Route path="/" element={<Navigate to="/login" replace />} />
               <Route path="/projects" element={<Projects />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/donate" element={<Donate />} />
               
             </Routes>
           </div>

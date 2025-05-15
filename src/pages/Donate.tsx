@@ -6,7 +6,7 @@ import { useToast } from "../hooks/use-toast";
 import PageWrapper from "../components/PageWrapper";
 import { useLoading } from "../context/LoadingContext";
 import TransactionCard from "../components/TransactionCard";
-import DashboardAnalytics from "../components/DashboardAnalytics";
+import DashboardAnalytics2 from "../components/dashboardAnalytics2";
 
 export default function Donate() {
   const { setLoading } = useLoading();
@@ -62,9 +62,9 @@ export default function Donate() {
     }
   ];
 
-  const donationAnalytics = {
+
+  const donationAnalytics2 = {
     totalFunding: "24,500",
-    pendingPayouts: "3,000",
     availableBalance: "15,000",
     transactionHistory: [
       { month: "Jan", received: 4000, sent: 1500 },
@@ -77,7 +77,7 @@ export default function Donate() {
   };
 
   const [showBanner, setShowBanner] = useState(true);
-
+  
   return (
     <PageWrapper>
       <main className="bg-gray-50 dark:bg-gray-900 min-h-screen">
@@ -143,11 +143,10 @@ export default function Donate() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Column - Analytics */}
             <div className="lg:col-span-2">
-              <DashboardAnalytics 
-                totalFunded={donationAnalytics.totalFunded}
-                pendingPayouts={donationAnalytics.pendingPayouts}
-                availableBalance={donationAnalytics.availableBalance}
-                transactionHistory={donationAnalytics.transactionHistory}
+              <DashboardAnalytics2 
+                totalFunding={donationAnalytics2.totalFunding}
+                availableBalance={donationAnalytics2.availableBalance}
+                transactionHistory={donationAnalytics2.transactionHistory}
               />
             </div>
 

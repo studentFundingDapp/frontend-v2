@@ -43,6 +43,8 @@ const Login = ({ setIsAuthenticated }: { setIsAuthenticated: React.Dispatch<Reac
       });
   
       const result = await res.json();
+
+      const role = result.user.role;
   
       if (!res.ok) {
         throw new Error(result.message || "Invalid email or password");
@@ -50,11 +52,24 @@ const Login = ({ setIsAuthenticated }: { setIsAuthenticated: React.Dispatch<Reac
   
       // OPTIONAL: Store JWT or user info
       localStorage.setItem("token", result.token); // if token is returned
+      localStorage.setItem("userRole", result.user.role);
       setIsAuthenticated(true);
   
       toast.success("Login successful!");
-      setTimeout(() => navigate("/dashboard"), 1000);
-    } catch (error: unknown) {
+      // setTimeout(() => navigate("/dashboard"), 1000);//This directs all users to the dashboard so, no
+      if (role === "student"){
+        navigate("/dashboard")
+      }
+      if (role === "donor"){
+        navigate("/donation")
+      }
+      if (role === "admin"){
+        navigate("/Admin")
+      }else{
+        navigate("/dashboard")
+      }
+      }
+     catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "Failed to login. Please check your credentials.";
       toast.error(errorMessage);
     } finally {
