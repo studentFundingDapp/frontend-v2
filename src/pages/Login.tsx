@@ -29,53 +29,48 @@ const Login = ({ setIsAuthenticated }: { setIsAuthenticated: React.Dispatch<Reac
   });
 
   const onSubmit = async (data: LoginValues) => {
-    setIsLoading(true);
-    try {
-      const res = await fetch("http://studybae.online:8000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: data.email,
-          password: data.password,
-        }),
-      });
-  
-      const result = await res.json();
+  setIsLoading(true);
+  try {
+    const res = await fetch("http://studybae.online:8000/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: data.email,
+        password: data.password,
+      }),
+    });
 
-      const role = result.user.role;
-  
-      if (!res.ok) {
-        throw new Error(result.message || "Invalid email or password");
-      }
-  
-      // OPTIONAL: Store JWT or user info
-      localStorage.setItem("token", result.token); // if token is returned
-      localStorage.setItem("userRole", result.user.role);
-      setIsAuthenticated(true);
-  
-      toast.success("Login successful!");
-      // setTimeout(() => navigate("/dashboard"), 1000);//This directs all users to the dashboard so, no
-      if (role === "student"){
-        navigate("/dashboard")
-      }
-      if (role === "donor"){
-        navigate("/donation")
-      }
-      if (role === "admin"){
-        navigate("/Admin")
-      }else{
-        navigate("/dashboard")
-      }
-      }
-     catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to login. Please check your credentials.";
-      toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
+    let result: any = {};
+    try {
+      result = await res.json();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (jsonError) {
+      // If response is not JSON, fallback to text
+      const text = await res.text();
+      result = { message: text || "Unknown error" };
     }
-  };
+
+    if (!res.ok) {
+      console.error("Login failed:", result);
+      throw new Error(result.message || "Invalid email or password");
+    }
+
+    // OPTIONAL: Store JWT or user info
+    localStorage.setItem("token", result.token);
+    localStorage.setItem("userRole", result.user?.role || "");
+
+    toast.success("Login successful!");
+    navigate("/dashboard");
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Failed to login. Please check your credentials.";
+    toast.error(errorMessage);
+    console.error("Login error:", error);
+  } finally {
+    setIsLoading(false);
+  }
+};
   
 
   return (

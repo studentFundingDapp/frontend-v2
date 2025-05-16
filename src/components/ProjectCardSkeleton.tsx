@@ -1,62 +1,57 @@
 import { motion } from "framer-motion";
-import { Card } from "../components/ui/card";
-import { Skeleton } from "../components/ui/skeleton";
+import { Card } from "./ui/card";
+import { Skeleton } from "./ui/skeleton";
 
 const ProjectCardSkeleton = () => {
   return (
-    <Card className="overflow-hidden border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 transition-all duration-300 hover:shadow-md max-w-md w-full mx-auto">
-      {/* Card Header */}
-      <div className="p-4 flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <Skeleton className="h-10 w-10 rounded-full" />
-          <div>
-            <Skeleton className="h-4 w-24 mb-1" />
-            <Skeleton className="h-3 w-32" />
+    <motion.div
+      className="h-full"
+      initial={{ opacity: 0.3 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5, repeat: Infinity, repeatType: "reverse" }}
+    >
+      <Card className="project-card h-full flex flex-col border border-gray-200 dark:border-gray-800">
+        {/* Card Header */}
+        <div className="p-3 flex items-center justify-between border-b border-gray-100 dark:border-gray-800">
+          <div className="flex items-center space-x-2">
+            <Skeleton className="h-8 w-8 rounded-full" />
+            <div>
+              <Skeleton className="h-3 w-20 mb-1" />
+              <Skeleton className="h-2 w-24" />
+            </div>
+          </div>
+          <Skeleton className="h-2 w-12" />
+        </div>
+        
+        {/* Media Content - Fixed height for consistency */}
+        <div className="w-full aspect-video relative">
+          <Skeleton className="absolute inset-0" />
+        </div>
+        
+        {/* Content */}
+        <div className="p-4 flex-grow flex flex-col">
+          <Skeleton className="h-5 w-3/4 mb-2" />
+          <Skeleton className="h-3 w-full mb-1" />
+          <Skeleton className="h-3 w-full mb-1" />
+          <Skeleton className="h-3 w-2/3 mb-4" />
+          
+          {/* Tags */}
+          <div className="mt-auto flex space-x-2 mb-4">
+            <Skeleton className="h-4 w-16 rounded-full" />
+            <Skeleton className="h-4 w-14 rounded-full" />
+          </div>
+          
+          {/* Action Bar */}
+          <div className="mt-auto border-t border-gray-100 dark:border-gray-800 pt-3 flex justify-between">
+            <div className="flex space-x-4">
+              <Skeleton className="h-5 w-12" />
+              <Skeleton className="h-5 w-14" />
+            </div>
+            <Skeleton className="h-5 w-5 rounded-full" />
           </div>
         </div>
-        <Skeleton className="h-3 w-16" />
-      </div>
-      
-      {/* Media Content */}
-      <Skeleton className="w-full aspect-square" />
-      
-      {/* Action Buttons */}
-      <div className="p-4 flex items-center justify-between">
-        <div className="flex space-x-4">
-          <Skeleton className="h-6 w-6 rounded-full" />
-          <Skeleton className="h-6 w-6 rounded-full" />
-          <Skeleton className="h-6 w-6 rounded-full" />
-        </div>
-        <Skeleton className="h-6 w-6 rounded-full" />
-      </div>
-      
-      {/* Likes Count */}
-      <div className="px-4 pt-2">
-        <Skeleton className="h-4 w-16" />
-      </div>
-      
-      {/* Description */}
-      <div className="px-4 py-2">
-        <Skeleton className="h-4 w-full mb-2" />
-        <Skeleton className="h-4 w-3/4" />
-      </div>
-      
-      {/* Tags */}
-      <div className="px-4 py-2 flex flex-wrap">
-        <Skeleton className="h-3 w-16 mr-2" />
-        <Skeleton className="h-3 w-12" />
-      </div>
-      
-      {/* Timestamp */}
-      <div className="px-4 pb-3 pt-1">
-        <Skeleton className="h-3 w-24" />
-      </div>
-      
-      {/* View Project Button */}
-      <div className="px-4 pb-4">
-        <Skeleton className="h-9 w-full" />
-      </div>
-    </Card>
+      </Card>
+    </motion.div>
   );
 };
 

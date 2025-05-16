@@ -1,11 +1,10 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
+import { Bookmark, Eye, Heart, Share2 } from "lucide-react";
+import { useState } from "react";
+import { cn } from "../lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
-import { Heart, MessageSquare, Share2, Bookmark } from "lucide-react";
-import { Badge } from "./ui/badge";
-import { cn } from "../lib/utils";
 
 interface Comment {
   user: string;
@@ -30,6 +29,7 @@ interface ProjectCardProps {
   comments?: Comment[];
   student?: StudentDetails;
   buttonText?: string;
+  onClick?: () => void;
 }
 
 const ProjectCard: React.FC<ProjectCardProps> = ({
@@ -40,39 +40,29 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   location,
   tags = [],
   likesCount = 0,
-  comments = [],
   student,
-  buttonText = "View Project",
+  onClick,
 }) => {
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [expanded, setExpanded] = useState(false);
   const [currentLikes, setCurrentLikes] = useState(likesCount);
 
-  // Handle like toggle
-  const handleLike = () => {
+  const handleLike = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setLiked(!liked);
     setCurrentLikes(liked ? currentLikes - 1 : currentLikes + 1);
   };
 
-  // Handle save toggle
-  const handleSave = () => {
+  const handleSave = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setSaved(!saved);
   };
 
-  // Handle share
-  const handleShare = () => {
-    // In a real app, this would open a share dialog or copy a link
+  const handleShare = (e: React.MouseEvent) => {
+    e.stopPropagation();
     alert("Share functionality would open here");
   };
 
-  // Handle comment
-  const handleComment = () => {
-    // In a real app, this would open a comment modal or focus a comment input
-    alert("Comment functionality would open here");
-  };
-
-  // Get student initials for avatar fallback
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -81,177 +71,138 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
       .toUpperCase();
   };
 
-  // Truncate description
-  const truncateDescription = (text: string, maxLength: number) => {
-    if (text.length <= maxLength) return text;
-    return expanded ? text : `${text.substring(0, maxLength)}...`;
+  const getTagColor = (tag: string) => {
+    const lowerTag = tag.toLowerCase();
+    if (lowerTag === "approved") return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
+    if (lowerTag === "pending") return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300";
+    if (lowerTag === "rejected") return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300";
+    if (lowerTag === "completed") return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
+    if (lowerTag === "medical") return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300";
+    if (lowerTag === "technology") return "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300";
+    if (lowerTag === "business") return "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300";
+    if (lowerTag === "environment") return "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300";
+    if (lowerTag === "education") return "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300";
+    if (lowerTag === "arts") return "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300";
+    if (lowerTag === "social") return "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300";
+    return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
   };
 
   return (
-    <Card className="overflow-hidden border border-gray-200 bg-white transition-all duration-300 hover:shadow-md max-w-md w-full mx-auto">
-      {/* Card Header */}
-      <div className="p-4 flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <Avatar className="h-10 w-10 border border-gray-200">
-            <AvatarImage src={student?.avatarUrl} alt={student?.name || projectName} />
-            <AvatarFallback className="bg-blue-100 text-blue-800">
-              {student ? getInitials(student.name) : projectName[0].toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          
-          <div>
-            <div className="flex items-center">
-              <h3 className="font-semibold text-sm">{student?.name || projectName}</h3>
+    <motion.div
+      className="h-full"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      whileHover={{ y: -5, transition: { duration: 0.2 } }}
+    >
+      <Card 
+        className="project-card h-full flex flex-col cursor-pointer shadow-sm hover:shadow-md dark:shadow-gray-900/20 dark:bg-gray-800/80 dark:border-gray-700" 
+        onClick={onClick}
+      >
+        {/* Card Header */}
+        <div className="p-3 flex items-center justify-between border-b border-gray-100 dark:border-gray-700">
+          <div className="flex items-center space-x-2">
+            <Avatar className="h-8 w-8 ring-2 ring-white dark:ring-gray-800 shadow-sm">
+              <AvatarImage src={student?.avatarUrl} alt={student?.name || projectName} />
+              <AvatarFallback className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                {student ? getInitials(student.name) : projectName[0].toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            
+            <div>
+              <p className="font-medium text-sm text-gray-900 dark:text-gray-100 line-clamp-1">{student?.name || projectName}</p>
               {location && (
-                <span className="mx-1 text-gray-500 text-xs">•</span>
-              )}
-              {location && (
-                <Badge variant="outline" className="text-xs font-normal px-1.5 py-0 h-5">
-                  {location}
-                </Badge>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{location}</p>
               )}
             </div>
-            {student && (
-              <p className="text-xs text-gray-500">
-                {student.degree}{student.university && `, ${student.university}`}
-              </p>
-            )}
           </div>
+          
+          <span className="text-xs text-gray-400 dark:text-gray-500">{timestamp}</span>
         </div>
         
-        <span className="text-xs text-gray-500">{timestamp}</span>
-      </div>
-      
-      {/* Media Content */}
-      <div className="aspect-square overflow-hidden bg-gray-100 relative">
-        {imageUrl ? (
-          <motion.img 
-            src={imageUrl} 
-            alt={projectName} 
-            className="w-full h-full object-cover"
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.3 }}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-50">
-            <span className="text-4xl font-bold text-blue-300">{projectName[0]}</span>
-          </div>
-        )}
-      </div>
-      
-      {/* Action Buttons */}
-      <div className="p-4 flex items-center justify-between border-b border-gray-100">
-        <div className="flex space-x-4">
-          <motion.button 
-            className="focus:outline-none" 
-            onClick={handleLike}
-            whileTap={{ scale: 1.2 }}
-          >
-            <Heart 
-              className={cn("h-6 w-6 transition-colors", 
-                liked ? "fill-red-500 text-red-500" : "text-gray-700"
-              )} 
+        {/* Media Content - Fixed aspect ratio for consistent height */}
+        <div className="aspect-video w-full relative overflow-hidden bg-gray-100 dark:bg-gray-800">
+          {imageUrl ? (
+            <img 
+              src={imageUrl} 
+              alt={projectName} 
+              className="w-full h-full object-cover"
+              loading="lazy"
             />
-          </motion.button>
-          
-          <motion.button 
-            className="focus:outline-none" 
-            onClick={handleComment}
-            whileTap={{ scale: 1.2 }}
-          >
-            <MessageSquare className="h-6 w-6 text-gray-700" />
-          </motion.button>
-          
-          <motion.button 
-            className="focus:outline-none" 
-            onClick={handleShare}
-            whileTap={{ scale: 1.2 }}
-          >
-            <Share2 className="h-6 w-6 text-gray-700" />
-          </motion.button>
-        </div>
-        
-        <motion.button 
-          className="focus:outline-none" 
-          onClick={handleSave}
-          whileTap={{ scale: 1.2 }}
-        >
-          <Bookmark 
-            className={cn("h-6 w-6 transition-colors", 
-              saved ? "fill-blue-500 text-blue-500" : "text-gray-700"
-            )} 
-          />
-        </motion.button>
-      </div>
-      
-      {/* Likes Count */}
-      <div className="px-4 pt-2">
-        <p className="font-semibold text-sm">{currentLikes} {currentLikes === 1 ? 'like' : 'likes'}</p>
-      </div>
-      
-      {/* Description */}
-      <div className="px-4 py-2">
-        <p className="text-sm">
-          <span className="font-semibold">{projectName} </span>
-          {truncateDescription(description, 100)}
-          
-          {description.length > 100 && !expanded && (
-            <button 
-              className="text-gray-500 ml-1 focus:outline-none" 
-              onClick={() => setExpanded(true)}
-            >
-              more
-            </button>
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-50 dark:from-blue-900/30 dark:to-blue-800/20">
+              <span className="text-4xl font-bold text-blue-300 dark:text-blue-700">{projectName[0]}</span>
+            </div>
           )}
-        </p>
-        
-        {/* Tags */}
-        {tags.length > 0 && (
-          <div className="mt-2 flex flex-wrap">
-            {tags.map((tag, index) => (
-              <span key={index} className="text-blue-600 text-sm mr-1">
-                #{tag.replace(/\s+/g, '')}
-              </span>
-            ))}
+          
+          {/* Overlay with view button */}
+          <div className="absolute inset-0 bg-black bg-opacity-0 flex items-center justify-center opacity-0 transition-all group-hover:bg-opacity-30 hover:bg-opacity-30 hover:opacity-100">
+            <Button variant="secondary" size="sm" className="bg-white/90 text-gray-800 hover:bg-white dark:bg-gray-800/90 dark:text-gray-100 dark:hover:bg-gray-800 shadow-md rounded-full">
+              <Eye className="h-4 w-4 mr-1" /> View Details
+            </Button>
           </div>
-        )}
-      </div>
-      
-      {/* Comments */}
-      {comments.length > 0 && (
-        <div className="px-4 py-2">
-          {comments.length > 2 && (
-            <button className="text-gray-500 text-sm block mb-2 focus:outline-none">
-              View all {comments.length} comments
-            </button>
+        </div>
+        
+        {/* Project Info - Fixed height content for consistency */}
+        <div className="p-4 flex-grow flex flex-col min-h-[150px]">
+          <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1 line-clamp-1">{projectName}</h3>
+          
+          <p className="text-sm text-gray-700 dark:text-gray-300 mb-3 line-clamp-2">
+            {description}
+          </p>
+          
+          {/* Tags */}
+          {tags.length > 0 && (
+            <div className="mt-auto mb-3 flex flex-wrap gap-1">
+              {tags.map((tag, index) => (
+                <span 
+                  key={index} 
+                  className={cn("text-2xs px-2 py-0.5 rounded-full", getTagColor(tag))}
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
           )}
           
-          {comments.slice(0, 2).map((comment, index) => (
-            <p key={index} className="text-sm mb-1">
-              <span className="font-semibold">{comment.user} </span>
-              {comment.text}
-            </p>
-          ))}
+          {/* Action Buttons */}
+          <div className="mt-auto flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-3">
+            <div className="flex space-x-3">
+              <button 
+                className="flex items-center text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 text-sm" 
+                onClick={handleLike}
+              >
+                <Heart 
+                  className={cn("h-4 w-4 mr-1", 
+                    liked ? "fill-red-500 text-red-500" : ""
+                  )} 
+                />
+                {currentLikes}
+              </button>
+              
+              <button 
+                className="flex items-center text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 text-sm" 
+                onClick={handleShare}
+              >
+                <Share2 className="h-4 w-4 mr-1" />
+                Share
+              </button>
+            </div>
+            
+            <button 
+              className="text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400" 
+              onClick={handleSave}
+            >
+              <Bookmark 
+                className={cn("h-5 w-5", 
+                  saved ? "fill-blue-500 text-blue-500" : ""
+                )} 
+              />
+            </button>
+          </div>
         </div>
-      )}
-      
-      {/* Timestamp */}
-      <div className="px-4 pb-3 pt-1">
-        <p className="text-gray-500 text-xs uppercase tracking-wide">
-          Posted {timestamp}
-        </p>
-      </div>
-      
-      {/* View Project Button */}
-      <div className="px-4 pb-4">
-        <Button 
-          variant="outline" 
-          className="w-full text-blue-700 border-blue-700 hover:bg-blue-50"
-        >
-          {buttonText}
-        </Button>
-      </div>
-    </Card>
+      </Card>
+    </motion.div>
   );
 };
 

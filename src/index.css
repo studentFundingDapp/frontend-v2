@@ -37,20 +37,19 @@
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* Custom Card Properties */
+    --card-bg: 0 0% 100%;
+    --card-hover: 210 40% 98%;
+    --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.1);
   }
 
   .dark {
@@ -81,6 +80,7 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -89,6 +89,12 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Custom Card Properties for Dark Mode */
+    --card-bg: 222.2 84% 5.9%;
+    --card-hover: 217.2 32.6% 16%;
+    --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.3);
   }
 }
 
@@ -122,6 +128,11 @@ body {
   min-height: 100vh;
   background-color: #f9f9f9;
   color: #333;
+}
+
+.dark body {
+  background-color: #121212;
+  color: #f9f9f9;
 }
 
 a {
@@ -165,6 +176,10 @@ button:focus-visible {
   @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-900;
 }
 
+.dark .text-gradient {
+  @apply from-blue-400 to-blue-600;
+}
+
 .card-hover {
   @apply transition-all duration-300 hover:shadow-lg hover:translate-y-[-5px];
 }
@@ -173,8 +188,16 @@ button:focus-visible {
   @apply bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg;
 }
 
+.dark .glass-effect {
+  @apply bg-black bg-opacity-10;
+}
+
 .blue-gradient {
   @apply bg-gradient-to-r from-blue-600 to-blue-900;
+}
+
+.dark .blue-gradient {
+  @apply from-blue-700 to-blue-900;
 }
 
 .bg-grid-pattern {
@@ -186,6 +209,52 @@ button:focus-visible {
 .dark .bg-grid-pattern {
   background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
                     linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+}
+
+/* Custom scrollbar styling */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Card animations */
+.card-rise {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-rise:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1), 0 8px 10px -6px rgba(59, 130, 246, 0.1);
+}
+
+.dark .card-rise:hover {
+  box-shadow: 0 10px 25px -5px rgba(30, 64, 175, 0.15), 0 8px 10px -6px rgba(30, 64, 175, 0.15);
 }
 
 /* Twinkle animation for stars */
@@ -214,4 +283,131 @@ button:focus-visible {
     background-color: #2563eb;
     color: white;
   }
+}
+
+/* Additional dark mode utilities */
+.dark .glass-effect {
+  @apply bg-black bg-opacity-20 backdrop-filter backdrop-blur-lg border-gray-700;
+}
+
+.dark .blue-gradient {
+  @apply bg-gradient-to-r from-blue-900 to-blue-700;
+}
+
+/* Custom project card styling */
+.project-card {
+  @apply h-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden 
+  transition-all duration-300 shadow-sm hover:shadow-md;
+}
+
+.project-card-media {
+  @apply aspect-video w-full overflow-hidden;
+}
+
+.project-card-content {
+  @apply flex flex-col h-full;
+}
+
+.project-card-footer {
+  @apply mt-auto;
+}
+
+/* Card grid layout with consistent spacing */
+.project-grid {
+  @apply grid gap-4 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3;
+}
+
+/* Loading overlay */
+.loading-overlay {
+  @apply fixed inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-50
+  flex flex-col items-center justify-center transition-opacity;
+}
+
+/* Enhanced modal styling */
+.project-modal {
+  @apply dark:bg-gray-900/95 dark:backdrop-blur-xl dark:border-gray-800
+  max-h-[90vh] overflow-hidden rounded-xl shadow-xl;
+}
+
+/* Custom calendar styling */
+.rdp {
+  --rdp-cell-size: 40px;
+  --rdp-accent-color: #3b82f6;
+  --rdp-background-color: #e0f2fe;
+  --rdp-accent-color-dark: #2563eb;
+  --rdp-background-color-dark: #1e3a8a;
+  --rdp-outline: 2px solid var(--rdp-accent-color);
+  --rdp-outline-selected: 2px solid var(--rdp-accent-color);
+  margin: 1em;
+}
+
+.dark .rdp {
+  --rdp-accent-color: #60a5fa;
+  --rdp-background-color: rgba(30, 58, 138, 0.3);
+}
+
+.rdp-months {
+  @apply dark:bg-gray-900;
+}
+
+.rdp-day_selected, 
+.rdp-day_selected:focus-visible, 
+.rdp-day_selected:hover {
+  @apply bg-blue-600 text-white;
+}
+
+.dark .rdp-day_selected, 
+.dark .rdp-day_selected:focus-visible, 
+.dark .rdp-day_selected:hover {
+  @apply bg-blue-700;
+}
+
+.rdp-day_today {
+  @apply font-bold border border-blue-500;
+}
+
+.dark .rdp-day {
+  @apply text-gray-200;
+}
+
+.dark .rdp-day_disabled {
+  @apply text-gray-600;
+}
+
+.dark .rdp-button:hover:not([disabled]):not(.rdp-day_selected) {
+  @apply bg-gray-800;
+}
+
+/* Responsive design utilities */
+@media (max-width: 640px) {
+  .project-grid {
+    @apply grid-cols-1;
+  }
+  
+  .modal-content {
+    @apply flex-col;
+  }
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out forwards;
+}
+
+/* Transition utilities */
+.transition-height {
+  transition-property: height, max-height;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+/* Text utilities */
+.text-2xs {
+  font-size: 0.65rem;
+  line-height: 1rem;
 }
