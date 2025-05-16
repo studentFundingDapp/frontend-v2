@@ -16,7 +16,8 @@ const loginSchema = z.object({
 
 type LoginValues = z.infer<typeof loginSchema>;
 
-const Login = ({ setIsAuthenticated }: { setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>> }) => {
+// eslint-disable-next-line no-empty-pattern
+const Login = ({ }: { setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>> }) => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -42,7 +43,7 @@ const Login = ({ setIsAuthenticated }: { setIsAuthenticated: React.Dispatch<Reac
       }),
     });
 
-    let result: any = {};
+    let result: unknown = {};
     try {
       result = await res.json();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -54,12 +55,17 @@ const Login = ({ setIsAuthenticated }: { setIsAuthenticated: React.Dispatch<Reac
 
     if (!res.ok) {
       console.error("Login failed:", result);
-      throw new Error(result.message || "Invalid email or password");
+      const errorMessage =
+        typeof result === "object" && result !== null && "message" in result
+          ? (result as { message?: string }).message
+          : undefined;
+      throw new Error(errorMessage || "Invalid email or password");
     }
 
     // OPTIONAL: Store JWT or user info
-    localStorage.setItem("token", result.token);
-    localStorage.setItem("userRole", result.user?.role || "");
+    const { token, user } = result as { token: string; user?: { role?: string } };
+    localStorage.setItem("token", token);
+    localStorage.setItem("userRole", user?.role || "");
 
     toast.success("Login successful!");
     navigate("/dashboard");

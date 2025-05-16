@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type JSX } from "react";
 import { Navigate, Route, BrowserRouter as Router, Routes, useLocation } from "react-router-dom";
 import AuthFooter from "./components/AuthFooter";
 import Footer from "./components/Footer";
@@ -30,7 +30,7 @@ function App() {
     <ThemeProvider>
       <LoadingProvider>
         <Router>
-          <AppContent isAuthenticated={isAuthenticated} />
+          <AppContent isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} />
           <Toaster position="top-right" />
         </Router>
       </LoadingProvider>
@@ -38,7 +38,7 @@ function App() {
   );
 }
 
-function AppContent({ isAuthenticated }: { isAuthenticated: boolean }) {
+function AppContent({ isAuthenticated, setIsAuthenticated }: { isAuthenticated: boolean; setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>> }) {
   const location = useLocation();
 
   // Define authentication and not found routes
@@ -59,13 +59,13 @@ function AppContent({ isAuthenticated }: { isAuthenticated: boolean }) {
           <Route
             path="/login"
             element={
-              isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />
+              isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login setIsAuthenticated={setIsAuthenticated} />
             }
           />
           <Route
             path="/register"
             element={
-              isAuthenticated ? <Navigate to="/dashboard" replace /> : <Register />
+              isAuthenticated ? <Navigate to="/dashboard" replace /> : <Register setIsAuthenticated={setIsAuthenticated} />
             }
           />
 

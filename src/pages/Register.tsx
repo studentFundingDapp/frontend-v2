@@ -28,7 +28,12 @@ const registerSchema = z.object({
 
 type RegisterValues = z.infer<typeof registerSchema>;
 
-const Register = () => {
+interface RegisterProps {
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+// eslint-disable-next-line no-empty-pattern
+const Register = ({ }: RegisterProps) => {
   const [isLoading, setIsLoading] = useState(false);
   // Removed unused apiError state
   const navigate = useNavigate();

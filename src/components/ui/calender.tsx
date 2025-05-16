@@ -16,7 +16,7 @@ function Calendar({
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      className={cn("p-3", className)}
+      className={cn("p-3", className ?? "")}
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
@@ -53,9 +53,9 @@ function Calendar({
       }}
       components={{
         // eslint-disable-next-line no-empty-pattern
-        IconLeft: ({ }) => <ChevronLeft className="h-4 w-4" />,
+        IconPrevious: ({ }) => <ChevronLeft className="h-4 w-4" />,
         // eslint-disable-next-line no-empty-pattern
-        IconRight: ({ }) => <ChevronRight className="h-4 w-4" />,
+        IconNext: ({ }) => <ChevronRight className="h-4 w-4" />,
       }}
       {...props}
     />

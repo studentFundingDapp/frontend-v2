@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Plus, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import NewProjectModal from "../components/NewProjectModal";
@@ -12,6 +12,10 @@ import { useLoading } from "../context/LoadingContext";
 
 // Types for project data based on API specs
 export interface Project {
+  university: ReactNode;
+  studentAvatar: string | undefined;
+  studentName: unknown;
+  mediaUrls: unknown;
   id: string;
   title: string;
   description: string;

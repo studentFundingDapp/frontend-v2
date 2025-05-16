@@ -1,6 +1,6 @@
-import * as React from "react"
 import * as LabelPrimitive from "@radix-ui/react-label"
 import { Slot } from "@radix-ui/react-slot"
+import * as React from "react"
 import {
   Controller,
   type ControllerProps,
@@ -11,7 +11,7 @@ import {
 } from "react-hook-form"
 
 import { cn } from "../../lib/utils"
-import { Label } from "./label" // Update the path to the correct location of the 'label' module
+import { Label } from "./label"; // Update the path to the correct location of the 'label' module
 
 const Form = FormProvider
 
@@ -78,7 +78,7 @@ const FormItem = React.forwardRef<
 
   return (
     <FormItemContext.Provider value={{ id }}>
-      <div ref={ref} className={cn("space-y-2", className || "")} {...props} />
+      <div ref={ref} className={cn("space-y-2", className ?? "")} {...props} />
     </FormItemContext.Provider>
   )
 })
@@ -93,7 +93,7 @@ const FormLabel = React.forwardRef<
   return (
     <Label
       ref={ref}
-      className={cn(error && "text-destructive", className || "")}
+      className={cn(error ? "text-destructive" : undefined, className || "")}
       htmlFor={formItemId}
       {...props}
     />
@@ -133,7 +133,7 @@ const FormDescription = React.forwardRef<
     <p
       ref={ref}
       id={formDescriptionId}
-      className={cn("text-sm text-muted-foreground", className || "")}
+      className={cn("text-sm text-muted-foreground", className ?? "")}
       {...props}
     />
   )
@@ -155,7 +155,7 @@ const FormMessage = React.forwardRef<
     <p
       ref={ref}
       id={formMessageId}
-      className={cn("text-sm font-medium text-destructive", className || "")}
+      className={cn("text-sm font-medium text-destructive", className ?? "")}
       {...props}
     >
       {body}
@@ -165,13 +165,10 @@ const FormMessage = React.forwardRef<
 FormMessage.displayName = "FormMessage"
 
 export {
+  Form, FormControl,
+  FormDescription, FormField, FormItem,
+  FormLabel, FormMessage,
   // eslint-disable-next-line react-refresh/only-export-components
-  useFormField,
-  Form,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormDescription,
-  FormMessage,
-  FormField,
+  useFormField
 }
+

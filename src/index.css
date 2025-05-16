@@ -50,7 +50,6 @@
     --card-hover: 210 40% 98%;
     --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.1);
-  }
 
   .dark {
     --background: 222.2 84% 4.9%;
@@ -95,16 +94,17 @@
     --card-hover: 217.2 32.6% 16%;
     --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.3);
-  }
-}
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
+    border-width: 1px;
+    border-style: solid;
   }
 
   body {
-    @apply bg-background text-foreground;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
     font-family: 'Inter', sans-serif;
   }
 }
@@ -173,31 +173,45 @@ button:focus-visible {
 
 /* Custom animations and utilities */
 .text-gradient {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-900;
+  background: linear-gradient(to right, #2563eb, #1e3a8a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
 }
 
 .dark .text-gradient {
-  @apply from-blue-400 to-blue-600;
+  background: linear-gradient(to right, #60a5fa, #2563eb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
 }
 
 .card-hover {
-  @apply transition-all duration-300 hover:shadow-lg hover:translate-y-[-5px];
+  transition: all 0.3s;
+}
+.card-hover:hover {
+  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.1), 0 4px 6px -4px rgba(59, 130, 246, 0.1);
+  transform: translateY(-5px);
 }
 
 .glass-effect {
-  @apply bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg;
+  background-color: rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
 }
 
 .dark .glass-effect {
-  @apply bg-black bg-opacity-10;
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .blue-gradient {
-  @apply bg-gradient-to-r from-blue-600 to-blue-900;
+  background-image: linear-gradient(to right, #2563eb, #1e3a8a);
 }
 
 .dark .blue-gradient {
-  @apply from-blue-700 to-blue-900;
+  background-image: linear-gradient(to right, #1e40af, #1e3a8a);
 }
 
 .bg-grid-pattern {
@@ -287,55 +301,108 @@ button:focus-visible {
 
 /* Additional dark mode utilities */
 .dark .glass-effect {
-  @apply bg-black bg-opacity-20 backdrop-filter backdrop-blur-lg border-gray-700;
+  background-color: rgba(0, 0, 0, 0.2);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid #374151; /* border-gray-700 */
 }
 
 .dark .blue-gradient {
-  @apply bg-gradient-to-r from-blue-900 to-blue-700;
+  background-image: linear-gradient(to right, #1e3a8a, #1e40af);
 }
 
 /* Custom project card styling */
 .project-card {
-  @apply h-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden 
-  transition-all duration-300 shadow-sm hover:shadow-md;
-}
-
+  height: 100%;
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
 .project-card-media {
-  @apply aspect-video w-full overflow-hidden;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  overflow: hidden;
 }
 
 .project-card-content {
-  @apply flex flex-col h-full;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .project-card-footer {
-  @apply mt-auto;
+  margin-top: auto;
 }
 
 /* Card grid layout with consistent spacing */
 .project-grid {
-  @apply grid gap-4 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3;
-}
-
-/* Loading overlay */
 .loading-overlay {
-  @apply fixed inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-50
-  flex flex-col items-center justify-center transition-opacity;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(255,255,255,0.8);
+  backdrop-filter: blur(4px);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s;
+}
+.dark .loading-overlay {
+  background-color: rgba(17,24,39,0.8);
 }
 
 /* Enhanced modal styling */
 .project-modal {
-  @apply dark:bg-gray-900/95 dark:backdrop-blur-xl dark:border-gray-800
-  max-h-[90vh] overflow-hidden rounded-xl shadow-xl;
+  max-height: 90vh;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 25px -5px rgba(59,130,246,0.1), 0 8px 10px -6px rgba(59,130,246,0.1);
+}
+.dark .project-modal {
+  background-color: rgba(17,24,39,0.95);
+  backdrop-filter: blur(20px);
+  border-color: #1f2937;
+}
+/* No direct equivalent for @apply dark:bg-gray-900, handled below */
+.dark .rdp-months {
+  background-color: #111827;
 }
 
-/* Custom calendar styling */
-.rdp {
-  --rdp-cell-size: 40px;
-  --rdp-accent-color: #3b82f6;
-  --rdp-background-color: #e0f2fe;
-  --rdp-accent-color-dark: #2563eb;
-  --rdp-background-color-dark: #1e3a8a;
+.rdp-day_selected, 
+.rdp-day_selected:focus-visible, 
+.rdp-day_selected:hover {
+  background-color: #2563eb;
+  color: #fff;
+}
+
+.dark .rdp-day_selected, 
+.dark .rdp-day_selected:focus-visible, 
+.dark .rdp-day_selected:hover {
+  background-color: #1d4ed8;
+}
+
+.rdp-day_today {
+  font-weight: bold;
+  border: 1px solid #3b82f6;
+}
+
+.dark .rdp-day {
+  color: #e5e7eb;
+}
+
+.dark .rdp-day_disabled {
+  color: #4b5563;
+}
+
+@media (max-width: 640px) {
+  .project-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .modal-content {
+    flex-direction: column;
+  }
+}
   --rdp-outline: 2px solid var(--rdp-accent-color);
   --rdp-outline-selected: 2px solid var(--rdp-accent-color);
   margin: 1em;
@@ -346,46 +413,50 @@ button:focus-visible {
   --rdp-background-color: rgba(30, 58, 138, 0.3);
 }
 
-.rdp-months {
-  @apply dark:bg-gray-900;
+/* .rdp-months dark mode background handled below */
+
+.dark .rdp-months {
+  background-color: #111827; /* Equivalent to bg-gray-900 */
 }
 
 .rdp-day_selected, 
 .rdp-day_selected:focus-visible, 
 .rdp-day_selected:hover {
-  @apply bg-blue-600 text-white;
+  background-color: #2563eb; /* Tailwind bg-blue-600 */
+  color: #fff; /* Tailwind text-white */
 }
-
 .dark .rdp-day_selected, 
 .dark .rdp-day_selected:focus-visible, 
 .dark .rdp-day_selected:hover {
-  @apply bg-blue-700;
+  background-color: #1d4ed8; /* Tailwind bg-blue-700 */
 }
-
+}
 .rdp-day_today {
-  @apply font-bold border border-blue-500;
+  font-weight: bold; /* Tailwind font-bold */
+  border: 1px solid #3b82f6; /* Tailwind border-blue-500 */
 }
-
 .dark .rdp-day {
-  @apply text-gray-200;
+  color: #e5e7eb; /* Tailwind text-gray-200 */
 }
 
 .dark .rdp-day_disabled {
-  @apply text-gray-600;
+  color: #4b5563; /* Tailwind text-gray-600 */
 }
 
 .dark .rdp-button:hover:not([disabled]):not(.rdp-day_selected) {
-  @apply bg-gray-800;
+  background-color: #1f2937; /* Tailwind bg-gray-800 */
 }
-
-/* Responsive design utilities */
+  background-color: #1f2937; /* Tailwind bg-gray-800 */
+}
 @media (max-width: 640px) {
   .project-grid {
-    @apply grid-cols-1;
+    grid-template-columns: 1fr;
   }
   
   .modal-content {
-    @apply flex-col;
+    flex-direction: column;
+  }
+}
   }
 }
 
