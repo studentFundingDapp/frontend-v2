@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Plus, Trash2 } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import NewProjectModal from "../components/NewProjectModal";
@@ -11,25 +11,28 @@ import { useLoading } from "../context/LoadingContext";
 
 // Types for project data based on API specs
 export interface Project {
-  university: ReactNode;
-  studentAvatar: string | undefined;
-  studentName: unknown;
-  mediaUrls?: string[];
+  deadline: string | number | Date;
+  current_amount: number;
   id: string;
   title: string;
   description: string;
-  objectives: string;
-  deliverables: string;
+  status: string;
+  fundingGoal: number;
+  currentFunding: number;
+  imageUrl: string;
+  mediaUrls: string[];
   category: string;
-  target_amount: number;
-  current_amount: number;
-  wallet_address: string;
-  deadline: string;
-  status: "pending" | "approved" | "rejected" | "completed";
-  created_at: string;
-  updated_at: string;
-  image_url?: string;
+  createdAt: string;
+  updatedAt: string;
+  walletAddress: string;
+  university?: string;
+  studentName?: string;
+  tags?: string[];
+  githubUrl?: string;
+  linkedinUrl?: string;
+  twitterUrl?: string;
 }
+
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -111,8 +114,8 @@ const ProjectsPage = () => {
       setPublicProjects(allProjects);
       return;
     }
-    setMyProjects(allProjects.filter(p => p.wallet_address === walletAddress));
-    setPublicProjects(allProjects.filter(p => p.wallet_address !== walletAddress));
+    setMyProjects(allProjects.filter(p => p.walletAddress === walletAddress));
+    setPublicProjects(allProjects.filter(p => p.walletAddress !== walletAddress));
   }, [allProjects, walletAddress]);
 
   // Filtering and sorting for public projects
@@ -126,7 +129,7 @@ const ProjectsPage = () => {
     )
     .sort((a, b) => {
       if (sortBy === "recent") {
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       }
       if (sortBy === "amount") {
         return (b.current_amount || 0) - (a.current_amount || 0);
@@ -148,7 +151,7 @@ const ProjectsPage = () => {
     )
     .sort((a, b) => {
       if (sortBy === "recent") {
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       }
       if (sortBy === "amount") {
         return (b.current_amount || 0) - (a.current_amount || 0);
@@ -272,8 +275,8 @@ const ProjectsPage = () => {
                   <ProjectCard
                     projectName={project.title}
                     description={project.description}
-                    imageUrl={project.image_url}
-                    timestamp={new Date(project.created_at).toLocaleDateString()}
+                    imageUrl={project.imageUrl}
+                    timestamp={new Date(project.createdAt).toLocaleDateString()}
                     location={undefined}
                     tags={[project.category, project.status]}
                     likesCount={Math.floor(Math.random() * 50)}
@@ -331,8 +334,8 @@ const ProjectsPage = () => {
                   <ProjectCard
                     projectName={project.title}
                     description={project.description}
-                    imageUrl={project.image_url}
-                    timestamp={new Date(project.created_at).toLocaleDateString()}
+                    imageUrl={project.imageUrl}
+                    timestamp={new Date(project.createdAt).toLocaleDateString()}
                     location={undefined}
                     tags={[project.category, project.status]}
                     likesCount={Math.floor(Math.random() * 100)}

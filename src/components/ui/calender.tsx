@@ -53,9 +53,9 @@ function Calendar({
       }}
       components={{
         // eslint-disable-next-line no-empty-pattern
-        IconPrevious: ({ }) => <ChevronLeft className="h-4 w-4" />,
+        IconLeft: ({ }) => <ChevronLeft className="h-4 w-4" />,
         // eslint-disable-next-line no-empty-pattern
-        IconNext: ({ }) => <ChevronRight className="h-4 w-4" />,
+        IconRight: ({ }) => <ChevronRight className="h-4 w-4" />,
       }}
       {...props}
     />

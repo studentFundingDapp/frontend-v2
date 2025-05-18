@@ -133,23 +133,27 @@ const PLACEHOLDER_IMG = "https://placehold.co/600x400?text=Project+Image";
 // Pagination settings
 const PROJECTS_PER_PAGE = 6;
 
-const PLACEHOLDER_PROJECT = {
-  mediaUrls: [],
+const PLACEHOLDER_PROJECT: Project = {
+  id: "",
   title: "",
-  status: "pending",
-  category: "",
-  created_at: new Date().toISOString(),
-  studentName: "",
-  studentAvatar: "",
-  university: "",
   description: "",
-  objectives: "",
-  deliverables: "",
-  target_amount: 0,
-  current_amount: 0,
-  deadline: new Date().toISOString(),
-  wallet_address: "",
+  status: "pending",
+  fundingGoal: 0,
+  currentFunding: 0,
+  imageUrl: PLACEHOLDER_IMG,
+  mediaUrls: [],
+  category: "",
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  walletAddress: "",
+  university: "",
+  studentName: "",
+  tags: [],
+  githubUrl: "",
+  linkedinUrl: "",
+  twitterUrl: ""
 };
+
 
 const Profile = () => {
   const { loading, setLoading } = useLoading();
@@ -572,6 +576,17 @@ interface Project {
   fundingGoal: number;
   currentFunding: number;
   imageUrl: string;
+  mediaUrls: string[];
+  category: string;
+  createdAt: string;
+  updatedAt: string;
+  walletAddress: string;
+  university?: string;
+  studentName: string;
+  tags: string[];
+  githubUrl: string;
+  linkedinUrl: string;
+  twitterUrl: string;
 }
 
 interface ProjectCardProps {
