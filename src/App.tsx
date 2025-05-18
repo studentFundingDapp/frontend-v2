@@ -8,12 +8,10 @@ import { ThemeProvider } from "./context/ThemeProvider";
 import About from "./pages/About";
 import Dashboard from "./pages/Dashboard";
 import Donations from "./pages/Donations";
-import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import Projects from "./pages/Projects";
-import Register from "./pages/Register";
 
-// Remove PrivateRoute and authentication logic for deployment/demo
+// Removed PrivateRoute and authentication logic for deployment/demo
 function App() {
   return (
     <ThemeProvider>
@@ -30,7 +28,6 @@ function App() {
 function AppContent() {
   const location = useLocation();
 
-  // Only hide NavBar and Footer on not found routes (optional)
   const isNotFound =
     location.pathname === "/404" ||
     location.pathname === "/not-found" ||
@@ -49,9 +46,11 @@ function AppContent() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/donations" element={<Donations />} />
 
-          {/* Optionally, keep auth pages for testing */}
+          {/* Authentication pages (commented out for production/demo) */}
+          {/*
           <Route path="/login" element={<Login setIsAuthenticated={() => {}} />} />
           <Route path="/register" element={<Register setIsAuthenticated={() => {}} />} />
+          */}
 
           {/* Default route: redirect to dashboard */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
