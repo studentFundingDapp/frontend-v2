@@ -11,7 +11,7 @@ import {
 } from "react-hook-form"
 
 import { cn } from "../../lib/utils"
-import { Label } from "./label"; // Update the path to the correct location of the 'label' module
+import { Label } from "./label"; // Updated the path to the correct location of the 'label' module
 
 const Form = FormProvider
 
@@ -50,6 +50,9 @@ const useFormField = () => {
     throw new Error("useFormField should be used within <FormField>")
   }
 
+  if (!itemContext) {
+    throw new Error("useFormField should be used within <FormItem>");
+  }
   const { id } = itemContext
 
   return {
@@ -66,9 +69,7 @@ type FormItemContextValue = {
   id: string
 }
 
-const FormItemContext = React.createContext<FormItemContextValue>(
-  {} as FormItemContextValue
-)
+const FormItemContext = React.createContext<FormItemContextValue | null>(null)
 
 const FormItem = React.forwardRef<
   HTMLDivElement,
@@ -88,13 +89,13 @@ const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
 >(({ className, ...props }, ref) => {
-  const { error, formItemId } = useFormField()
+  const { formItemId } = useFormField()
 
   return (
     <Label
       ref={ref}
       htmlFor={formItemId ?? ""}
-      className={cn(className || "", error && "text-destructive")}
+      className={cn(className || "")}
       {...props}
     />
 

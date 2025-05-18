@@ -17,6 +17,7 @@ import { useLoading } from "../context/LoadingContext";
 import { useToast } from "../hooks/use-toast";
 
 
+
 // Mock data for initial development
 const mockUserData = {
   fullName: "Kelvin Mukaria",
@@ -48,7 +49,12 @@ const mockUserData = {
       tags: ["Blockchain", "Education"],
       githubUrl: "",
       linkedinUrl: "",
-      twitterUrl: ""
+      twitterUrl: "",
+      objectives: "",
+      deliverables: "",
+      deadline: "",
+      target_amount: 5000,
+      current_amount: 3200
     },
     { 
       id: "2", 
@@ -71,7 +77,12 @@ const mockUserData = {
       tags: ["Crypto", "Education"],
       githubUrl: "",
       linkedinUrl: "",
-      twitterUrl: ""
+      twitterUrl: "",
+      objectives: "",
+      deliverables: "",
+      deadline: "",
+      target_amount: 2000,
+      current_amount: 0
     },
     { 
       id: "3", 
@@ -94,7 +105,12 @@ const mockUserData = {
       tags: ["DeFi", "Loans"],
       githubUrl: "",
       linkedinUrl: "",
-      twitterUrl: ""
+      twitterUrl: "",
+      objectives: "",
+      deliverables: "",
+      deadline: "",
+      target_amount: 10000,
+      current_amount: 10000
     }
   ]
 };
@@ -146,12 +162,18 @@ const PLACEHOLDER_PROJECT: Project = {
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
   walletAddress: "",
+  objectives: "",
+  deliverables: "",
+  deadline: "",
   university: "",
+  studentAvatar: "",
   studentName: "",
   tags: [],
   githubUrl: "",
   linkedinUrl: "",
-  twitterUrl: ""
+  twitterUrl: "",
+  target_amount: 0,
+  current_amount: 0
 };
 
 
@@ -453,8 +475,19 @@ const Profile = () => {
               {paginatedProjects.map((project) => (
                 <ProjectCard
                   key={project.id}
-                  project={{ ...project, imageUrl: project.imageUrl || PLACEHOLDER_IMG }}
-                  onView={() => handleViewProject(project)}
+                  project={{ 
+                    ...project, 
+                    imageUrl: project.imageUrl || PLACEHOLDER_IMG,
+                    target_amount: project.fundingGoal,
+                    current_amount: project.currentFunding,
+                    objectives: project.objectives ?? ""
+                  }}
+                  onView={() => handleViewProject({
+                    ...project, 
+                    target_amount: project.fundingGoal, 
+                    current_amount: project.currentFunding,
+                    objectives: project.objectives ?? ""
+                  })}
                 />
               ))}
             </div>
@@ -568,7 +601,7 @@ const StatsCard = ({ title, value, icon, prefix = "", isText = false }: StatsCar
 };
 
 // Project Card Component
-interface Project {
+export interface Project {
   id: string;
   title: string;
   description: string;
@@ -581,13 +614,20 @@ interface Project {
   createdAt: string;
   updatedAt: string;
   walletAddress: string;
-  university?: string;
+  studentAvatar: string;
   studentName: string;
-  tags: string[];
-  githubUrl: string;
-  linkedinUrl: string;
-  twitterUrl: string;
+  university: string;
+  tags?: string[];
+  githubUrl?: string;
+  linkedinUrl?: string;
+  twitterUrl?: string;
+  objectives: string;
+  deliverables: string;
+  deadline: string;
+  target_amount: number;
+  current_amount: number;
 }
+
 
 interface ProjectCardProps {
   project: Project;

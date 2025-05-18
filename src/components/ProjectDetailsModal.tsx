@@ -146,7 +146,7 @@ const ProjectDetailsModal = ({ project, isOpen, onClose }: ProjectDetailsModalPr
                   </Badge>
                   <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
                     <Clock className="h-3 w-3 mr-1" />
-                    {formatDate(project.created_at)}
+                    {formatDate(project.createdAt)}
                   </span>
                 </div>
                 <h2 className="text-xl md:text-2xl font-bold mb-2 text-blue-800 dark:text-blue-400">
@@ -229,12 +229,12 @@ const ProjectDetailsModal = ({ project, isOpen, onClose }: ProjectDetailsModalPr
                 </div>
               </div>
               
-              {project.wallet_address && (
+              {project.walletAddress && (
                 <div className="bg-gray-50/70 dark:bg-gray-800/40 p-3 rounded-lg backdrop-blur-sm border border-gray-100 dark:border-gray-700">
                   <h3 className="font-medium mb-1 text-gray-800 dark:text-gray-300">Wallet</h3>
                   <div className="flex items-center text-gray-600 dark:text-gray-400 text-sm">
                     <Wallet className="h-4 w-4 mr-2 text-blue-500 dark:text-blue-400" />
-                    <span className="font-mono">{formatWalletAddress(project.wallet_address)}</span>
+                    <span className="font-mono">{formatWalletAddress(project.walletAddress)}</span>
                   </div>
                 </div>
               )}

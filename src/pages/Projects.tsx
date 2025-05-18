@@ -11,8 +11,6 @@ import { useLoading } from "../context/LoadingContext";
 
 // Types for project data based on API specs
 export interface Project {
-  deadline: string | number | Date;
-  current_amount: number;
   id: string;
   title: string;
   description: string;
@@ -25,13 +23,21 @@ export interface Project {
   createdAt: string;
   updatedAt: string;
   walletAddress: string;
-  university?: string;
-  studentName?: string;
+  studentAvatar: string;
+  studentName: string;
+  university: string;
   tags?: string[];
   githubUrl?: string;
   linkedinUrl?: string;
   twitterUrl?: string;
+  // Adding these missing fields
+  target_amount: number;
+  current_amount: number;
+  objectives: string;
+  deliverables: string;
+  deadline: string;
 }
+
 
 
 const containerVariants = {
