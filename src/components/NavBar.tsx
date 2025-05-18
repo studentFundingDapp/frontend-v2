@@ -1,8 +1,8 @@
+import { motion } from "framer-motion";
+import { FileText, Home, Info, Menu, User, Users, X } from "lucide-react";
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { ThemeToggle } from "../context/ThemeProvider";
-import { FileText, Home, Info, Menu, User, Users, X } from "lucide-react";
-import { motion } from "framer-motion";
 import { useIsMobile } from "../hooks/use-mobile";
 
 const NavBar: React.FC = () => {
@@ -159,7 +159,7 @@ const NavBar: React.FC = () => {
             <NavLink
               to="/dashboard"
               className={({ isActive }) =>
-                `block items-center text-gray-700 dark:text-gray-200 font-medium hover:text-blue-600 dark:hover:text-blue-400 ${
+                `flex items-center text-gray-700 dark:text-gray-200 font-medium hover:text-blue-600 dark:hover:text-blue-400 ${
                   isActive ? "text-blue-600 dark:text-blue-400 underline" : ""
                 }`
               }
@@ -171,7 +171,7 @@ const NavBar: React.FC = () => {
             <NavLink
               to="/projects"
               className={({ isActive }) =>
-                `block items-center text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 ${
+                `flex items-center text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 ${
                   isActive ? "text-blue-600 dark:text-blue-400 underline" : ""
                 }`
               }
@@ -183,7 +183,7 @@ const NavBar: React.FC = () => {
             <NavLink
               to="/donations"
               className={({ isActive }) =>
-                `block items-center text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 ${
+                `flex items-center text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 ${
                   isActive ? "text-blue-600 dark:text-blue-400 underline" : ""
                 }`
               }
@@ -195,7 +195,7 @@ const NavBar: React.FC = () => {
             <NavLink
               to="/about"
               className={({ isActive }) =>
-                `block items-center text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 ${
+                `flex items-center text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 ${
                   isActive ? "text-blue-600 dark:text-blue-400 underline" : ""
                 }`
               }
@@ -207,7 +207,7 @@ const NavBar: React.FC = () => {
             <NavLink
               to="/profile"
               className={({ isActive }) =>
-                `block items-center text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 ${
+                `flex items-center text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 ${
                   isActive ? "text-blue-600 dark:text-blue-400 underline" : ""
                 }`
               }
