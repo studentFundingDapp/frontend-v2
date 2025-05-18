@@ -1,4 +1,3 @@
-import { useEffect, useState, type JSX } from "react";
 import { Navigate, Route, BrowserRouter as Router, Routes, useLocation } from "react-router-dom";
 import AuthFooter from "./components/AuthFooter";
 import Footer from "./components/Footer";
@@ -14,26 +13,13 @@ import Profile from "./pages/Profile";
 import Projects from "./pages/Projects";
 import Register from "./pages/Register";
 
-function PrivateRoute({ children }: { children: JSX.Element }) {
-  const token = localStorage.getItem("token");
-  return token ? children : <Navigate to="/login" replace />;
-}
-
+// Remove PrivateRoute and authentication logic for deployment/demo
 function App() {
-  // Optional: redirect to dashboard if already logged in and visiting /login or /register
-  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("token"));
-
-  useEffect(() => {
-    const handleStorage = () => setIsAuthenticated(!!localStorage.getItem("token"));
-    window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
-  }, []);
-
   return (
     <ThemeProvider>
       <LoadingProvider>
         <Router>
-          <AppContent isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} />
+          <AppContent />
           <Toaster position="top-right" />
         </Router>
       </LoadingProvider>
@@ -41,13 +27,11 @@ function App() {
   );
 }
 
-function AppContent({ isAuthenticated, setIsAuthenticated }: { isAuthenticated: boolean; setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>> }) {
+function AppContent() {
   const location = useLocation();
 
-  // Define authentication and not found routes
-  const authRoutes = ["/login", "/register"];
-  const isAuthOrNotFound =
-    authRoutes.includes(location.pathname) ||
+  // Only hide NavBar and Footer on not found routes (optional)
+  const isNotFound =
     location.pathname === "/404" ||
     location.pathname === "/not-found" ||
     location.pathname === "*" ||
@@ -55,77 +39,26 @@ function AppContent({ isAuthenticated, setIsAuthenticated }: { isAuthenticated: 
 
   return (
     <div className="flex flex-col min-h-screen">
-      {!isAuthOrNotFound && <NavBar />}
+      {!isNotFound && <NavBar />}
       <div className="flex-grow">
         <Routes>
-          {/* Public Auth Routes */}
-          <Route
-            path="/login"
-            element={
-              isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login setIsAuthenticated={setIsAuthenticated} />
-            }
-          />
-          <Route
-            path="/register"
-            element={
-              isAuthenticated ? <Navigate to="/dashboard" replace /> : <Register setIsAuthenticated={setIsAuthenticated} />
-            }
-          />
+          {/* Direct access to all main pages */}
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/projects" element={<Projects />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/donations" element={<Donations />} />
 
-          {/* Protected Routes */}
-          <Route
-            path="/dashboard"
-            element={
-              <PrivateRoute>
-                <Dashboard />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/projects"
-            element={
-              <PrivateRoute>
-                <Projects />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/about"
-            element={
-              <PrivateRoute>
-                <About />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <PrivateRoute>
-                <Profile />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/donations"
-            element={
-              <PrivateRoute>
-                <Donations />
-              </PrivateRoute>
-            }
-          />
-          {/* ...other protected routes... */}
+          {/* Optionally, keep auth pages for testing */}
+          <Route path="/login" element={<Login setIsAuthenticated={() => {}} />} />
+          <Route path="/register" element={<Register setIsAuthenticated={() => {}} />} />
 
-          {/* Default route: redirect to login if not authenticated */}
-          <Route
-            path="*"
-            element={
-              isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />
-            }
-          />
+          {/* Default route: redirect to dashboard */}
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </div>
-      {!isAuthOrNotFound && <Footer />}
-      {isAuthOrNotFound && <AuthFooter />}
+      {!isNotFound && <Footer />}
+      {isNotFound && <AuthFooter />}
     </div>
   );
 }
