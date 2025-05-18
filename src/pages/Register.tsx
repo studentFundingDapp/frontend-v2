@@ -18,13 +18,14 @@ const registerSchema = z.object({
   role: z.enum(["student", "donor", "admin"], { message: "Select a valid role" }),
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string().min(6, "Password must be at least 6 characters"),
-  terms: z.boolean().refine(val => val === true, {
+    terms: z.boolean().refine((val: boolean) => val === true, {
     message: "You must accept the terms and conditions",
   }),
-}).refine(data => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
+  }).refine((data: { password: string; confirmPassword: string }) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
+
 
 type RegisterValues = z.infer<typeof registerSchema>;
 
