@@ -6,8 +6,11 @@ import NavBar from "./components/NavBar";
 import { Toaster } from "./components/ui/sonner";
 import { LoadingProvider } from "./context/LoadingContext";
 import { ThemeProvider } from "./context/ThemeProvider";
+import About from "./pages/About";
 import Dashboard from "./pages/Dashboard";
+import Donations from "./pages/Donations";
 import Login from "./pages/Login";
+import Profile from "./pages/Profile";
 import Projects from "./pages/Projects";
 import Register from "./pages/Register";
 
@@ -83,6 +86,30 @@ function AppContent({ isAuthenticated, setIsAuthenticated }: { isAuthenticated: 
             element={
               <PrivateRoute>
                 <Projects />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/about"
+            element={
+              <PrivateRoute>
+                <About />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <Profile />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/donations"
+            element={
+              <PrivateRoute>
+                <Donations />
               </PrivateRoute>
             }
           />

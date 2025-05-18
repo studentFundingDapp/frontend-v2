@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import NewProjectModal from "../components/NewProjectModal";
 import ProjectCard from "../components/ProjectCard";
-import ProjectCardSkeleton from "../components/ProjectCardSkeleton";
 import ProjectDetailsModal from "../components/ProjectDetailsModal";
 import { Button } from "../components/ui/button";
 import { useLoading } from "../context/LoadingContext";
@@ -15,7 +14,7 @@ export interface Project {
   university: ReactNode;
   studentAvatar: string | undefined;
   studentName: unknown;
-  mediaUrls: unknown;
+  mediaUrls?: string[];
   id: string;
   title: string;
   description: string;
@@ -42,19 +41,29 @@ const containerVariants = {
 
 const ProjectsPage = () => {
   const navigate = useNavigate();
-  const { setLoading } = useLoading();
+  const { loading, setLoading } = useLoading(); // Use loading context
   const [allProjects, setAllProjects] = useState<Project[]>([]);
   const [myProjects, setMyProjects] = useState<Project[]>([]);
   const [publicProjects, setPublicProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [walletAddress, setWalletAddress] = useState<string>("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("recent");
   const [search, setSearch] = useState<string>("");
+  const [ready, setReady] = useState(false);
+
+  // Initial loading before page opens (like About page)
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => {
+      setLoading(false);
+      setReady(true);
+    }, 1000); // Simulate 1s loading
+    return () => clearTimeout(timer);
+  }, [setLoading]);
 
   // Check if user is logged in
   useEffect(() => {
@@ -73,8 +82,8 @@ const ProjectsPage = () => {
 
   // Fetch all projects
   useEffect(() => {
+    if (!ready) return;
     const fetchProjects = async () => {
-      setIsLoading(true);
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
@@ -87,15 +96,13 @@ const ProjectsPage = () => {
         setAllProjects(data);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
-        toast.error("Failed to load projects");
         setAllProjects([]);
       } finally {
-        setIsLoading(false);
         setLoading(false);
       }
     };
     fetchProjects();
-  }, [setLoading]);
+  }, [setLoading, ready]);
 
   // Split projects into "My Projects" and "Public Projects"
   useEffect(() => {
@@ -175,6 +182,9 @@ const ProjectsPage = () => {
     setIsDetailsModalOpen(true);
   };
 
+  // Show loading spinner before the page opens
+  if (loading || !ready) return null;
+
   return (
     <div className="container mx-auto px-4 py-6 sm:py-8 min-h-screen bg-white dark:bg-gray-900">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 sm:mb-8">
@@ -232,18 +242,7 @@ const ProjectsPage = () => {
 
       {/* My Projects Section */}
       <section className="mb-10">
-        {isLoading ? (
-          <motion.div 
-            className="grid gap-4 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {[1, 2, 3].map((i) => (
-              <ProjectCardSkeleton key={i} />
-            ))}
-          </motion.div>
-        ) : filteredMyProjects.length === 0 ? (
+        {filteredMyProjects.length === 0 ? (
           <motion.div 
             className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700"
             initial={{ opacity: 0 }}
@@ -310,18 +309,7 @@ const ProjectsPage = () => {
       >
         <h2 className="text-xl sm:text-2xl font-semibold mb-6 text-gray-900 dark:text-gray-100">Explore Other Projects</h2>
         
-        {isLoading ? (
-          <motion.div 
-            className="grid gap-4 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {[1, 2, 3].map((i) => (
-              <ProjectCardSkeleton key={i} />
-            ))}
-          </motion.div>
-        ) : filteredPublicProjects.length === 0 ? (
+        {filteredPublicProjects.length === 0 ? (
           <motion.div 
             className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700"
             initial={{ opacity: 0 }}

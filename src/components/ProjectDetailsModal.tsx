@@ -1,22 +1,22 @@
 import { motion } from "framer-motion";
-import { Dialog, DialogContent } from "./ui/dialog";
-import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { 
-  Clock, 
-  Heart, 
-  MessageSquare, 
-  Share2, 
-  ChevronRight, 
-  AlertCircle, 
-  Calendar, 
-  Wallet,
+import {
+  AlertCircle,
+  Calendar,
+  ChevronRight,
+  Clock,
+  Heart,
+  MessageSquare,
+  Share2,
   Target,
+  Wallet,
   X
 } from "lucide-react";
-import type { Project } from "../pages/Projects";
 import { useIsMobile } from "../hooks/use-mobile";
+import type { Project } from "../pages/Projects";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import { Dialog, DialogContent, DialogTitle } from "./ui/dialog";
 
 interface ProjectDetailsModalProps {
   project: Project;
@@ -72,6 +72,10 @@ const ProjectDetailsModal = ({ project, isOpen, onClose }: ProjectDetailsModalPr
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="project-modal sm:max-w-4xl p-0 gap-0 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/95 dark:backdrop-blur-xl shadow-xl">
+        <DialogTitle className="text-lg sm:text-xl font-semibold p-4 border-b border-gray-200 dark:border-gray-700">
+          {project.title || "Project Details"}
+        </DialogTitle>
+
         {/* Close button in the top-right corner */}
         <Button
           variant="ghost"
@@ -152,7 +156,7 @@ const ProjectDetailsModal = ({ project, isOpen, onClose }: ProjectDetailsModalPr
             )}
             
             {/* Student info - conditionally rendered if available */}
-            {project.studentName && (
+            {typeof project.studentName === "string" && project.studentName && (
               <div className="flex items-center mb-4 p-3 bg-blue-50/80 dark:bg-blue-900/20 rounded-lg backdrop-blur-sm">
                 <Avatar className="h-9 w-9 border-2 border-white dark:border-gray-700 ring-2 ring-blue-500/10 shadow-sm">
                   <AvatarImage src={project.studentAvatar} alt={project.studentName} />

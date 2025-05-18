@@ -1,26 +1,32 @@
-import { useEffect } from "react";
-import { useState } from "react";
 import { Wallet } from "lucide-react";
-import { Button } from "../components/ui/button";
-import { useToast } from "../hooks/use-toast";
-import PageWrapper from "../components/PageWrapper";
-import { useLoading } from "../context/LoadingContext";
-import TransactionCard from "../components/TransactionCard";
+import { useEffect, useState } from "react";
 import DashboardAnalytics from "../components/DashboardAnalytics";
+import PageWrapper from "../components/PageWrapper";
+import TransactionCard from "../components/TransactionCard";
+import { Button } from "../components/ui/button";
+import { useLoading } from "../context/LoadingContext";
+import { useToast } from "../hooks/use-toast";
 
 export default function Index() {
-  const { setLoading } = useLoading();
+  const { loading, setLoading } = useLoading(); // Use loading context
   const { toast } = useToast();
 
+  // Show loading spinner before the page opens (simulate fetch)
+  const [ready, setReady] = useState(false);
   useEffect(() => {
-    // Simulate loading
     setLoading(true);
     const timer = setTimeout(() => {
-      setLoading(false); // Stop loading after 2 seconds
-    }, 2000);
-
-    return () => clearTimeout(timer); // Cleanup timer
+      setLoading(false);
+      setReady(true);
+    }, 1000); // Simulate 1s loading
+    return () => clearTimeout(timer);
   }, [setLoading]);
+
+  const [showBanner, setShowBanner] = useState(true);
+
+  if (loading || !ready) {
+    return null;
+  }
 
   const showNotification = (action: string) => {
     toast({
@@ -29,8 +35,6 @@ export default function Index() {
       duration: 3000,
     });
   };
-
-  const [showBanner, setShowBanner] = useState(true);
 
   // Mock transaction data
   const recentTransactions = [

@@ -85,7 +85,7 @@ const NavBar: React.FC = () => {
               Projects
             </NavLink>
             <NavLink
-              to="/funders"
+              to="/donations"
               className={({ isActive }) =>
                 `relative flex items-center text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 ${
                   isActive ? "text-blue-600 dark:text-blue-400 underline" : ""
@@ -94,7 +94,7 @@ const NavBar: React.FC = () => {
               onClick={closeMobileMenu}
             >
               <Users className="h-4 w-4 mr-2" />
-              Funders
+              Donations
             </NavLink>
             <NavLink
               to="/about"
@@ -181,7 +181,7 @@ const NavBar: React.FC = () => {
               Projects
             </NavLink>
             <NavLink
-              to="/funders"
+              to="/donations"
               className={({ isActive }) =>
                 `block items-center text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 ${
                   isActive ? "text-blue-600 dark:text-blue-400 underline" : ""
@@ -190,7 +190,7 @@ const NavBar: React.FC = () => {
               onClick={closeMobileMenu}
             >
               <Users className="h-4 w-4 mr-2" />
-              Funders
+              Donations
             </NavLink>
             <NavLink
               to="/about"
