@@ -6,9 +6,9 @@ import { Toaster } from "./components/ui/toaster";
 import { LoadingProvider } from "./context/LoadingContext";
 import { ThemeProvider } from "./context/ThemeProvider";
 import Dashboard from "./pages/Dashboard";
-import Login from "./pages/Login";
+import {Login} from "./pages/Login";
 import NotFound from "./pages/NotFound";
-import Register from "./pages/Register";
+import {Register}from "./pages/Register";
 import Projects from "./pages/Projects"; // Ensure the file exists at this path
 
 function App() {
