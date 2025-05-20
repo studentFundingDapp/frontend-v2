@@ -1,10 +1,9 @@
 // src/services/api.ts
 
-import { AuthResponse, ChallengeResponse, User } from '../types/stellar';
+import type { AuthResponse, User, ChallengeResponse } from '../types/stellar';
 
-const API_URL = '/api'; // Replace with your actual API URL in production
+const API_URL = 'http://studybae.online:8000'; 
 
-// Helper function for making API requests
 async function fetchWithAuth(
   endpoint: string, 
   options: RequestInit = {}
@@ -30,9 +29,7 @@ async function fetchWithAuth(
   return response.json();
 }
 
-// Auth API calls
 export const authAPI = {
-  // Request authentication challenge
   getChallenge: async (publicKey: string): Promise<ChallengeResponse> => {
     return fetchWithAuth('/auth/challenge', {
       method: 'POST',
@@ -40,7 +37,6 @@ export const authAPI = {
     });
   },
   
-  // Verify signature and authenticate
   verifyWallet: async (
     publicKey: string, 
     challenge: string, 
@@ -51,24 +47,20 @@ export const authAPI = {
       body: JSON.stringify({ publicKey, challenge, signature })
     });
   },
-  
-  // Verify if token is valid
+
   verifyToken: async (): Promise<{ valid: boolean }> => {
     return fetchWithAuth('/auth/verify');
   }
 };
 
-// Student API calls
 export const studentAPI = {
-  // Create or update student profile
   createProfile: async (profileData: Partial<User>): Promise<{ message: string }> => {
     return fetchWithAuth('/students/profile', {
       method: 'POST',
       body: JSON.stringify(profileData)
     });
   },
-  
-  // Get current user profile
+
   getProfile: async (): Promise<User> => {
     return fetchWithAuth('/students/profile');
   }

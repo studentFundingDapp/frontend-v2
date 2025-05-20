@@ -3,6 +3,17 @@
 import { useState, useEffect } from 'react';
 import { authAPI } from '../services/api';
 
+// Extend the Window interface to include freighter
+declare global {
+  interface Window extends globalThis.Window {
+    freighter?: {
+      isConnected: () => Promise<boolean>;
+      getPublicKey: () => Promise<string>;
+      signMessage: (message: string) => Promise<{ signedMessage: string }>;
+    };
+  }
+}
+
 // Interface for the hook's return value
 export interface StellarAuthHook {
   publicKey: string | null;
@@ -132,4 +143,3 @@ export const useStellarAuth = (): StellarAuthHook => {
     logout
   };
 };
-https://app.getpostman.com/join-team?invite_code=142531e8ecb81e79d3be60004bdc9a1fe4a9fe90229cfba90e66a0dcc31179d3

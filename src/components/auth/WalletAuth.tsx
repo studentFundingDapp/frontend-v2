@@ -1,79 +1,34 @@
 // src/components/auth/WalletAuth.tsx
-
 import React from 'react';
 import { useAuth } from './AuthContext';
 
-interface WalletAuthProps {
-  onAuthSuccess?: () => void;
-}
+export const WalletAuth: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSuccess }) => {
+  const { loginWithWallet, publicKey, isAuthenticated } = useAuth();
 
-export const WalletAuth: React.FC<WalletAuthProps> = ({ onAuthSuccess }) => {
-  const { 
-    publicKey, 
-    isLoading, 
-    isAuthenticated, 
-    error, 
-    connectWallet, 
-    authenticate 
-  } = useAuth();
-
-  // Handle wallet connection and authentication
-  const handleAuthFlow = async () => {
-    if (!publicKey) {
-      await connectWallet();
-    } else if (!isAuthenticated) {
-      const success = await authenticate();
+  const handleConnectWallet = async () => {
+    try {
+      const success = await loginWithWallet(); // trigger wallet login flow
       if (success && onAuthSuccess) {
         onAuthSuccess();
       }
+    } catch (error) {
+      console.error("Wallet connection failed:", error);
     }
   };
 
   return (
-    <div className="wallet-auth">
-      {error && (
-        <div className="error-message">
-          {error}
+    <div className="flex flex-col items-center">
+      {isAuthenticated && publicKey ? (
+        <div className="text-green-600 font-medium">
+          Wallet Connected: {publicKey.slice(0, 6)}...{publicKey.slice(-4)}
         </div>
-      )}
-      
-      <div className="wallet-status">
-        {publicKey ? (
-          <div className="connected">
-            <div className="status-dot connected"></div>
-            <span>Wallet Connected:</span>
-            <span className="public-key">
-              {publicKey.substring(0, 6)}...{publicKey.substring(publicKey.length - 6)}
-            </span>
-          </div>
-        ) : (
-          <div className="not-connected">
-            <div className="status-dot not-connected"></div>
-            <span>No Wallet Connected</span>
-          </div>
-        )}
-      </div>
-      
-      <button 
-        className="wallet-button"
-        onClick={handleAuthFlow}
-        disabled={isLoading}
-      >
-        {isLoading ? (
-          <span>Processing...</span>
-        ) : !publicKey ? (
-          <span>Connect Stellar Wallet</span>
-        ) : !isAuthenticated ? (
-          <span>Authenticate with Wallet</span>
-        ) : (
-          <span>Wallet Connected</span>
-        )}
-      </button>
-      
-      {publicKey && !isAuthenticated && (
-        <p className="auth-note">
-          Please authenticate with your wallet to continue.
-        </p>
+      ) : (
+        <button
+          onClick={handleConnectWallet}
+          className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+        >
+          Connect Stellar Wallet
+        </button>
       )}
     </div>
   );

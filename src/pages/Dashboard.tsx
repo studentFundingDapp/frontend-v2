@@ -1,25 +1,32 @@
-import { useEffect } from "react";
 import { Wallet } from "lucide-react";
-import { Button } from "../components/ui/button";
-import { useToast } from "../hooks/use-toast";
-import PageWrapper from "../components/PageWrapper";
-import { useLoading } from "../context/LoadingContext";
-import TransactionCard from "../components/TransactionCard";
+import { useEffect, useState } from "react";
 import DashboardAnalytics from "../components/DashboardAnalytics";
+import PageWrapper from "../components/PageWrapper";
+import TransactionCard from "../components/TransactionCard";
+import { Button } from "../components/ui/button";
+import { useLoading } from "../context/LoadingContext";
+import { useToast } from "../hooks/use-toast";
 
 export default function Index() {
-  const { setLoading } = useLoading();
+  const { loading, setLoading } = useLoading(); // Use loading context
   const { toast } = useToast();
 
+  // Show loading spinner before the page opens (simulate fetch)
+  const [ready, setReady] = useState(false);
   useEffect(() => {
-    // Simulate loading
     setLoading(true);
     const timer = setTimeout(() => {
-      setLoading(false); // Stop loading after 2 seconds
-    }, 2000);
-
-    return () => clearTimeout(timer); // Cleanup timer
+      setLoading(false);
+      setReady(true);
+    }, 1000); // Simulate 1s loading
+    return () => clearTimeout(timer);
   }, [setLoading]);
+
+  const [showBanner, setShowBanner] = useState(true);
+
+  if (loading || !ready) {
+    return null;
+  }
 
   const showNotification = (action: string) => {
     toast({
@@ -84,14 +91,36 @@ export default function Index() {
       
       <main className="bg-gray-50 dark:bg-gray-900 min-h-screen">
         {/* Welcome Banner */}
-        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 py-3">
+        {/* <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 py-3">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between">
               <p className="text-sm dark:text-gray-300">Welcome back! Your Stellar wallet is <span className="text-blue-600 dark:text-blue-400 font-medium">ready for transactions</span></p>
               <Button size="sm" variant="ghost" className="text-xs">Dismiss</Button>
             </div>
           </div>
-        </div>
+        </div> */}
+
+{/* to set the dismiss button to make the welcome message disappear */}
+        {showBanner && (
+  <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 py-3">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="flex items-center justify-between">
+        <p className="text-sm dark:text-gray-300">
+          Welcome back! Your <span className="text-blue-600 dark:text-blue-400 font-medium">donation wallet</span> is active.
+        </p>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="text-xs"
+          onClick={() => setShowBanner(false)}
+        >
+          Dismiss
+        </Button>
+      </div>
+    </div>
+  </div>
+)}
+
 
         {/* Dashboard Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">

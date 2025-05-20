@@ -1,94 +1,55 @@
 // src/components/auth/AuthContext.tsx
-
-import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
-import { User } from '../../types/stellar';
-import { useStellarAuth } from '../../hooks/useStellarAuth';
-import { studentAPI } from '../../services/api';
+import React, { createContext, useContext, useState } from 'react';
 
 interface AuthContextType {
-  user: User | null;
-  isLoading: boolean;
-  isAuthenticated: boolean;
-  error: string | null;
   publicKey: string | null;
-  connectWallet: () => Promise<void>;
-  authenticate: () => Promise<boolean>;
+  isAuthenticated: boolean;
+  loginWithWallet: () => Promise<boolean>;
   logout: () => void;
-  getUserProfile: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType>({
+  publicKey: null,
+  isAuthenticated: false,
+  loginWithWallet: async () => false,
+  logout: () => {},
+});
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  
-  const { 
-    publicKey,
-    isConnecting,
-    isAuthenticated, 
-    error, 
-    connectWallet, 
-    authenticate, 
-    logout: stellarLogout 
-  } = useStellarAuth();
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [publicKey, setPublicKey] = useState<string | null>(null);
 
-  // Fetch user profile if authenticated
-  const getUserProfile = async (): Promise<void> => {
-    if (!isAuthenticated) return;
-    
+  const loginWithWallet = async (): Promise<boolean> => {
     try {
-      const userProfile = await studentAPI.getProfile();
-      setUser(userProfile);
-    } catch (err) {
-      console.error('Failed to fetch user profile:', err);
+      if (window.freighterApi) {
+        const key = await window.freighterApi.getPublicKey();
+        setPublicKey(key);
+        return true;
+      } else {
+        alert("Please install the Freighter wallet extension.");
+        return false;
+      }
+    } catch (error) {
+      console.error("Wallet login error:", error);
+      return false;
     }
   };
 
-  // Check authentication status on mount and when isAuthenticated changes
-  useEffect(() => {
-    const loadUserData = async () => {
-      if (isAuthenticated) {
-        await getUserProfile();
-      } else {
-        setUser(null);
-      }
-      setIsLoading(false);
-    };
-    
-    loadUserData();
-  }, [isAuthenticated]);
-
-  // Custom logout that clears user data
   const logout = () => {
-    stellarLogout();
-    setUser(null);
+    setPublicKey(null);
   };
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      isLoading: isLoading || isConnecting,
-      isAuthenticated,
-      error,
-      publicKey,
-      connectWallet,
-      authenticate,
-      logout,
-      getUserProfile
-    }}>
+    <AuthContext.Provider
+      value={{
+        publicKey,
+        isAuthenticated: !!publicKey,
+        loginWithWallet,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-// Custom hook to use the auth context
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
-  
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  
-  return context;
-};
+export const useAuth = () => useContext(AuthContext);

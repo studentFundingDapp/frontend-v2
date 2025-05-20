@@ -1,20 +1,21 @@
 // src/types/stellar.ts
 
-// Type definitions for Freighter wallet extension
-export interface FreighterWindow extends Window {
-  freighter?: {
-    isConnected: () => Promise<boolean>;
-    getPublicKey: () => Promise<string>;
-    signTransaction: (transaction: string) => Promise<string>;
-    signMessage: (message: string) => Promise<{ signedMessage: string }>;
+// Freighter wallet API types (matches what the extension exposes on window.freighterApi)
+export interface FreighterApi {
+  isConnected: () => Promise<boolean>;
+  getPublicKey: () => Promise<string>;
+  signTransaction: (transaction: string) => Promise<string>;
+  signMessage: (message: string) => Promise<{ signedMessage: string }>;
+}
+
+// Extend the global Window type to include Freighter
+declare global {
+  interface Window {
+    freighterApi?: FreighterApi;
   }
 }
 
-declare global {
-  interface Window extends FreighterWindow {}
-}
-
-// User types
+// User type
 export interface User {
   publicKey: string;
   name?: string;
@@ -25,7 +26,7 @@ export interface User {
   profileComplete?: boolean;
 }
 
-// Auth response types
+// Auth response type
 export interface AuthResponse {
   token: string;
   user?: User;
@@ -35,3 +36,6 @@ export interface AuthResponse {
 export interface ChallengeResponse {
   challenge: string;
 }
+
+// Make sure this file is treated as a module
+export {};

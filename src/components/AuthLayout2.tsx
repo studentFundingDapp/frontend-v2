@@ -2,7 +2,6 @@ import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import React from "react";
 import { ThemeToggle } from "../context/ThemeProvider";
-import AuthFooter from "./AuthFooter";
 
 interface AuthLayout2Props {
   children: React.ReactNode;
@@ -44,8 +43,6 @@ const AuthLayout2: React.FC<AuthLayout2Props> = ({ children }) => {
         {children}
       </div>
 
-      {/* Footer */}
-      <AuthFooter />
     </div>
   );
 };
