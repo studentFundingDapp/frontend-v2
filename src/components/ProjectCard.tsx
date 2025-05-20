@@ -1,10 +1,11 @@
 import { motion } from "framer-motion";
-import { Bookmark, Eye, Heart, Share2 } from "lucide-react";
+import { Bookmark, Eye, Heart, Share2,DollarSign } from "lucide-react";
 import { useState } from "react";
 import { cn } from "../lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
+import { useNavigate } from "react-router-dom";
 
 interface Comment {
   user: string;
@@ -18,7 +19,7 @@ interface StudentDetails {
   avatarUrl?: string;
 }
 
-interface ProjectCardProps {
+export interface ProjectCardProps {
   projectName: string;
   description: string;
   imageUrl?: string;
@@ -86,6 +87,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
     if (lowerTag === "social") return "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300";
     return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
   };
+
+  const navigate = useNavigate();
 
   return (
     <motion.div
@@ -187,6 +190,18 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                 <Share2 className="h-4 w-4 mr-1" />
                 Share
               </button>
+
+              <button 
+  className="flex items-center text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 text-sm"
+  onClick={(e) => {
+    e.stopPropagation();
+    navigate("/donate"); // replace with the actual donate route if different
+  }}
+>
+  <DollarSign className="h-4 w-4 mr-1" />
+  Fund
+</button>
+
             </div>
             
             <button 

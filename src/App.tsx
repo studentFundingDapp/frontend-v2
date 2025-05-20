@@ -10,6 +10,10 @@ import Dashboard from "./pages/Dashboard";
 import Donations from "./pages/Donations";
 import Profile from "./pages/Profile";
 import Projects from "./pages/Projects";
+import DashboardD from "./pages/DashboardD";
+import DonorNavBar from "./components/DonorNavBar";
+import Donate from "./pages/Donate";
+import ExploreStudents from "./pages/ExploreStudents";
 
 // Removed PrivateRoute and authentication logic for deployment/demo
 function App() {
@@ -27,6 +31,8 @@ function App() {
 
 function AppContent() {
   const location = useLocation();
+  const donorRoutes = ["/dashboard-d", "/donate", "/students"];
+ const isDonorPage = donorRoutes.includes(location.pathname);
 
   const isNotFound =
     location.pathname === "/404" ||
@@ -36,7 +42,7 @@ function AppContent() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {!isNotFound && <NavBar />}
+      {!isNotFound &&(isDonorPage ? <DonorNavBar/> : <NavBar />)}
       <div className="flex-grow">
         <Routes>
           {/* Direct access to all main pages */}
@@ -45,6 +51,9 @@ function AppContent() {
           <Route path="/about" element={<About />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/donations" element={<Donations />} />
+          <Route path="/dashboard-d" element={<DashboardD />} />
+          <Route path="/donate" element={<Donate />} />
+          <Route path="/students" element={<ExploreStudents />} />
 
           {/* Authentication pages (commented out for production/demo) */}
           {/*
@@ -56,6 +65,7 @@ function AppContent() {
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </div>
+      {!isNotFound && (isDonorPage ? <DonorNavBar /> : <NavBar />)}
       {!isNotFound && <Footer />}
       {isNotFound && <AuthFooter />}
     </div>

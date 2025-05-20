@@ -1,189 +1,146 @@
-import { useEffect } from "react";
 import { useState } from "react";
-import { Wallet } from "lucide-react";
+import * as Select from "@radix-ui/react-select";
 import { Button } from "../components/ui/button";
-import { useToast } from "../hooks/use-toast";
 import PageWrapper from "../components/PageWrapper";
-import { useLoading } from "../context/LoadingContext";
-import TransactionCard from "../components/TransactionCard";
-import DashboardAnalytics2 from "../components/dashboardAnalytics2";
+import { useToast } from "../hooks/use-toast";
 
 export default function Donate() {
-  const { setLoading } = useLoading();
   const { toast } = useToast();
+  const [amount, setAmount] = useState("");
+  const [anonymity, setAnonymity] = useState("Show Name");
+  const [donationTarget, setDonationTarget] = useState("students");
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, [setLoading]);
-
-  const showNotification = (action: string) => {
-    toast({
-      title: `${action} clicked!`,
-      description: "This feature will be available soon.",
-      duration: 3000,
-    });
-  };
-
-  const donationTransactions = [
-    {
-      type: "incoming" as const,
-      amount: "5,000",
-      stellarAddress: "GD6DUMMYDONORADDRESS1111111111111111",
-      timestamp: "1 day ago",
-      status: "completed" as const,
-      memo: "Church Donation"
-    },
-    {
-      type: "outgoing" as const,
-      amount: "1,000",
-      stellarAddress: "GAOUTREACHBENEFICIARYADDRESS222222",
-      timestamp: "3 days ago",
-      status: "completed" as const,
-      memo: "Outreach Expenses"
-    },
-    {
-      type: "incoming" as const,
-      amount: "3,200",
-      stellarAddress: "GCCOMMUNITYDONORADDRESS3333333",
-      timestamp: "1 week ago",
-      status: "completed" as const
-    },
-    {
-      type: "outgoing" as const,
-      amount: "500",
-      stellarAddress: "GASTUDENTSUPPORTADDRESS444444",
-      timestamp: "2 weeks ago",
-      status: "pending" as const
+  const handleDonate = async () => {
+    if (!amount || isNaN(Number(amount))) {
+      toast({ title: "Invalid Amount", description: "Please enter a valid amount." });
+      return;
     }
-  ];
 
+    const payload = {
+      amount,
+      targetType: donationTarget,
+      anonymous: anonymity === "Anonymous",
+    };
 
-  const donationAnalytics2 = {
-    totalFunding: "24,500",
-    availableBalance: "15,000",
-    transactionHistory: [
-      { month: "Jan", received: 4000, sent: 1500 },
-      { month: "Feb", received: 3800, sent: 2200 },
-      { month: "Mar", received: 4200, sent: 1800 },
-      { month: "Apr", received: 4600, sent: 1600 },
-      { month: "May", received: 5900, sent: 1700 },
-      { month: "Jun", received: 6000, sent: 1900 }
-    ]
+    setLoading(true);
+
+    try {
+      await fetch("/api/donate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      toast({
+        title: "Donation Successful",
+        description: `You donated ${amount} XLM${anonymity === "Anonymous" ? " anonymously" : ""} to ${donationTarget}.`,
+      });
+
+      setAmount("");
+    } catch {
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const [showBanner, setShowBanner] = useState(true);
-  
   return (
     <PageWrapper>
-      <main className="bg-gray-50 dark:bg-gray-900 min-h-screen">
-        
-        {showBanner && (
-  <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 py-3">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="flex items-center justify-between">
-        <p className="text-sm dark:text-gray-300">
-          Welcome back! Your <span className="text-blue-600 dark:text-blue-400 font-medium">donation wallet</span> is active.
-        </p>
-        <Button
-          size="sm"
-          variant="ghost"
-          className="text-xs"
-          onClick={() => setShowBanner(false)}
-        >
-          Dismiss
-        </Button>
-      </div>
-    </div>
-  </div>
-)}
+      <div className="max-w-xl mx-auto p-6 mt-10 bg-white dark:bg-gray-900 shadow rounded-lg">
+        <h2 className="text-2xl font-semibold mb-6 text-center">Make a Donation</h2>
 
+        <div className="mb-4">
+          <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">Amount (XLM)</label>
+          <input
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            className="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          />
+        </div>
 
-        {/* Dashboard Content */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          {/* Wallet Stats */}
-          <div className="flex flex-col md:flex-row items-center justify-between mb-6 bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
-            <div className="flex items-center mb-4 md:mb-0">
-              <Wallet className="h-8 w-8 text-blue-600 dark:text-blue-400 mr-3" />
-              <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Donation Wallet</p>
-                <p className="text-xl font-bold text-gray-900 dark:text-white">15,000 XLM</p>
-              </div>
-            </div>
+        <div className="mb-4">
+          <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">Choose Anonymity</label>
 
-            <div className="flex space-x-3">
-              <Button 
-                variant="outline" 
-                onClick={() => showNotification("Withdraw donation")}
-                className="border-orange-500 dark:border-orange-400 text-orange-500 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20"
-              >
-                Withdraw
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => showNotification("Send donation")}
-                className="border-blue-600 dark:border-blue-500 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-              >
-                Send
-              </Button>
-              <Button 
-                onClick={() => showNotification("Receive donation")}
-                className="bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-600"
-              >
-                Receive
-              </Button>
-            </div>
-          </div>
+          <Select.Root value={anonymity} onValueChange={setAnonymity}>
+            <Select.Trigger
+              className="inline-flex items-center justify-between w-full px-3 py-2 border border-gray-400 rounded dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+              aria-label="Select anonymity"
+            >
+              <Select.Value placeholder="Select anonymity" />
+              <Select.Icon>
+                <svg
+                  className="w-4 h-4 ml-2 transition-transform duration-200 group-data-[state=open]:rotate-180"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path d="M5.23 7.21a.75.75 0 011.06.02L10 11.294l3.71-4.06a.75.75 0 111.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0l-4.25-4.65a.75.75 0 01.02-1.06z" />
+                </svg>
+              </Select.Icon>
+            </Select.Trigger>
 
-          {/* Two Column Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column - Analytics */}
-            <div className="lg:col-span-2">
-              <DashboardAnalytics2 
-                totalFunding={donationAnalytics2.totalFunding}
-                availableBalance={donationAnalytics2.availableBalance}
-                transactionHistory={donationAnalytics2.transactionHistory}
-              />
-            </div>
-
-            {/* Right Column - Recent Transactions */}
-            <div className="lg:col-span-1">
-              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Recent Donations</h2>
-                  <Button 
-                    variant="ghost" 
-                    className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 p-0"
-                    onClick={() => showNotification("View all donations")}
+            <Select.Portal>
+              <Select.Content className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded shadow-md z-50">
+                <Select.Viewport>
+                  <Select.Item
+                    value="Show Name"
+                    className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                   >
-                    View all
-                  </Button>
-                </div>
+                    <Select.ItemText>Show Name</Select.ItemText>
+                  </Select.Item>
+                  <Select.Item
+                    value="Anonymous"
+                    className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                  >
+                    <Select.ItemText>Anonymous</Select.ItemText>
+                  </Select.Item>
+                </Select.Viewport>
+              </Select.Content>
+            </Select.Portal>
+          </Select.Root>
+        </div>
 
-                <div className="space-y-4">
-                  {donationTransactions.map((transaction, index) => (
-                    <TransactionCard
-                      key={index}
-                      type={transaction.type}
-                      amount={transaction.amount}
-                      stellarAddress={transaction.stellarAddress}
-                      timestamp={transaction.timestamp}
-                      status={transaction.status}
-                      memo={transaction.memo}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
+        <div className="mb-6">
+          <label className="block text-sm mb-2 text-gray-700 dark:text-gray-300">Send funds to</label>
+          <div className="flex space-x-4">
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                value="students"
+                checked={donationTarget === "students"}
+                onChange={(e) => setDonationTarget(e.target.value)}
+                className="form-radio text-blue-600"
+              />
+              <span className="text-gray-700 dark:text-gray-300">Students</span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                value="projects"
+                checked={donationTarget === "projects"}
+                onChange={(e) => setDonationTarget(e.target.value)}
+                className="form-radio text-blue-600"
+              />
+              <span className="text-gray-700 dark:text-gray-300">Projects</span>
+            </label>
           </div>
         </div>
-      </main>
+
+        <Button
+          onClick={handleDonate}
+          disabled={loading}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+        >
+          {loading ? "Processing..." : "Donate"}
+        </Button>
+      </div>
     </PageWrapper>
   );
 }
-
-  
