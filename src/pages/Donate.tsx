@@ -8,7 +8,6 @@ export default function Donate() {
   const { toast } = useToast();
   const [amount, setAmount] = useState("");
   const [anonymity, setAnonymity] = useState("Show Name");
-  const [donationTarget, setDonationTarget] = useState("students");
   const [loading, setLoading] = useState(false);
 
   const handleDonate = async () => {
@@ -19,7 +18,6 @@ export default function Donate() {
 
     const payload = {
       amount,
-      targetType: donationTarget,
       anonymous: anonymity === "Anonymous",
     };
 
@@ -36,7 +34,7 @@ export default function Donate() {
 
       toast({
         title: "Donation Successful",
-        description: `You donated ${amount} XLM${anonymity === "Anonymous" ? " anonymously" : ""} to ${donationTarget}.`,
+        // description: `You donated ${amount} XLM${anonymity === "Anonymous" ? " anonymously" : ""} to ${donationTarget}.`,
       });
 
       setAmount("");
@@ -61,6 +59,13 @@ export default function Donate() {
             type="number"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
+            className="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">Student/Project id (Optional)</label>
+          <input
+            type="string"
             className="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
           />
         </div>
@@ -105,32 +110,6 @@ export default function Donate() {
               </Select.Content>
             </Select.Portal>
           </Select.Root>
-        </div>
-
-        <div className="mb-6">
-          <label className="block text-sm mb-2 text-gray-700 dark:text-gray-300">Send funds to</label>
-          <div className="flex space-x-4">
-            <label className="flex items-center space-x-2">
-              <input
-                type="radio"
-                value="students"
-                checked={donationTarget === "students"}
-                onChange={(e) => setDonationTarget(e.target.value)}
-                className="form-radio text-blue-600"
-              />
-              <span className="text-gray-700 dark:text-gray-300">Students</span>
-            </label>
-            <label className="flex items-center space-x-2">
-              <input
-                type="radio"
-                value="projects"
-                checked={donationTarget === "projects"}
-                onChange={(e) => setDonationTarget(e.target.value)}
-                className="form-radio text-blue-600"
-              />
-              <span className="text-gray-700 dark:text-gray-300">Projects</span>
-            </label>
-          </div>
         </div>
 
         <Button

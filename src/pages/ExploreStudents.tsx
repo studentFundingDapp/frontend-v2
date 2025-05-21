@@ -19,6 +19,8 @@ const mockProjects: ProjectCardProps[] = [
       avatarUrl: "https://example.com/avatar1.jpg",
     },
     imageUrl: "https://example.com/project1.jpg",
+    fundingCurrent: 60,
+    fundingTarget: 100,
   },
   // Add more mock projects here...
 ];
