@@ -51,24 +51,24 @@ function AppContent() {
           <Route path="/register" element={<Register setIsAuthenticated={() => {}} />} />
 
           {/* Private Routes */}
-          {isAuthenticated ? (
-            <>
+          {/* {isAuthenticated ? (
+            <> */}
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/projects" element={<Projects />} />
               <Route path="/about" element={<About />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/donations" element={<Donations />} />
-            </>
-          ) : (
+            {/* </> */}
+          {/* ) : ( */}
             <>
               {/* If not authenticated, redirect protected paths to login */}
-              <Route path="/dashboard" element={<Navigate to="/login" replace />} />
+              {/* <Route path="/dashboard" element={<Navigate to="/login" replace />} />
               <Route path="/projects" element={<Navigate to="/login" replace />} />
               <Route path="/about" element={<Navigate to="/login" replace />} />
               <Route path="/profile" element={<Navigate to="/login" replace />} />
-              <Route path="/donations" element={<Navigate to="/login" replace />} />
+              <Route path="/donations" element={<Navigate to="/login" replace />} /> */}
             </>
-          )}
+          {/* )} */}
 
           {/* Catch-all */}
           <Route path="*" element={<Navigate to="/login" replace />} />
