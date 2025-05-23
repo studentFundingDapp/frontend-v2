@@ -1,14 +1,31 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as Select from "@radix-ui/react-select";
 import { Button } from "../components/ui/button";
 import PageWrapper from "../components/PageWrapper";
 import { useToast } from "../hooks/use-toast";
+import { useLoading } from "../context/LoadingContext";
 
 export default function Donate() {
   const { toast } = useToast();
   const [amount, setAmount] = useState("");
   const [anonymity, setAnonymity] = useState("Show Name");
-  const [loading, setLoading] = useState(false);
+   const { loading, setLoading } = useLoading();
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+      setLoading(true);
+      const timer = setTimeout(() => {
+        setLoading(false);
+        setReady(true);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }, [setLoading]);
+  
+    if (loading || !ready) {
+      return (
+        <div className="text-center p-10 text-gray-500">Loading Dashboard D...</div>
+      );
+    }
 
   const handleDonate = async () => {
     if (!amount || isNaN(Number(amount))) {

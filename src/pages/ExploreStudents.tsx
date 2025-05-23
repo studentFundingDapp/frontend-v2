@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import ProjectCard from "../components/ProjectCard";
 import type { ProjectCardProps } from "../components/ProjectCard";
 import PageWrapper from "../components/PageWrapper";
+import { useLoading } from "../context/LoadingContext";
 
 // ✅ mockProjects should match ProjectCardProps
 const mockProjects: ProjectCardProps[] = [
@@ -27,10 +28,24 @@ const mockProjects: ProjectCardProps[] = [
 
 const ExploreStudents = () => {
   const [projects, setProjects] = useState<ProjectCardProps[]>([]);
+   const { loading, setLoading } = useLoading();
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    setProjects(mockProjects);
-  }, []);
+      setLoading(true);
+      const timer = setTimeout(() => {
+        setLoading(false);
+        setReady(true);
+         setProjects(mockProjects);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }, [setLoading]);
+  
+    if (loading || !ready) {
+      return (
+        <div className="text-center p-10 text-gray-500">Loading Dashboard D...</div>
+      );
+    }
 
   return (
     <PageWrapper>

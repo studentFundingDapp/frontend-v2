@@ -14,6 +14,7 @@ import DashboardD from "./pages/DashboardD";
 import DonorNavBar from "./components/DonorNavBar";
 import Donate from "./pages/Donate";
 import ExploreStudents from "./pages/ExploreStudents";
+import DonorProfile from "./pages/DonorProfile";
 
 // Removed PrivateRoute and authentication logic for deployment/demo
 function App() {
@@ -31,7 +32,7 @@ function App() {
 
 function AppContent() {
   const location = useLocation();
-  const donorRoutes = ["/dashboard-d", "/donate", "/students"];
+  const donorRoutes = ["/dashboard-d", "/donate", "/students","/about", "/profile-d"];
  const isDonorPage = donorRoutes.includes(location.pathname);
 
   const isNotFound =
@@ -54,6 +55,7 @@ function AppContent() {
           <Route path="/dashboard-d" element={<DashboardD />} />
           <Route path="/donate" element={<Donate />} />
           <Route path="/students" element={<ExploreStudents />} />
+          <Route path="/profile-d" element={<DonorProfile />} />
 
           {/* Authentication pages (commented out for production/demo) */}
           {/*
