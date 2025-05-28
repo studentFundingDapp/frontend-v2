@@ -6,7 +6,7 @@ import TransactionCard from "../components/TransactionCard";
 import { Button } from "../components/ui/button";
 import { useLoading } from "../context/LoadingContext";
 import { useToast } from "../hooks/use-toast";
-
+import { getAccountBalance } from '../utils/stellar';
 export default function Index() {
   const { loading, setLoading } = useLoading(); // Use loading context
   const { toast } = useToast();
@@ -18,9 +18,17 @@ export default function Index() {
     const timer = setTimeout(() => {
       setLoading(false);
       setReady(true);
-    }, 1000); // Simulate 1s loading
+    }, 1000); // Simulate is loading
     return () => clearTimeout(timer);
   }, [setLoading]);
+
+  const [balance, setBalance] = useState<string>('0');
+
+  useEffect(() => {
+    if (publicKey) {
+      getAccountBalance(publicKey).then(setBalance);
+    }
+  }, [publicKey]);
 
   const [showBanner, setShowBanner] = useState(true);
 
@@ -86,8 +94,14 @@ export default function Index() {
   };
   
   return (
+    
     <PageWrapper>
-      
+      <div>
+      <header>
+     <p>Wallet: {publicKey?.slice(0, 8)}...{publicKey?.slice(-8)}</p>
+          <p>Balance: {balance} XLM</p>
+          </header>
+          </div>
       
       <main className="bg-gray-50 dark:bg-gray-900 min-h-screen">
         {/* Welcome Banner */}

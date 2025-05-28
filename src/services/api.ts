@@ -1,67 +1,72 @@
-// src/services/api.ts
+import getPublicKey, { signTransaction } from "@stellar/freighter-api";
 
-import type { AuthResponse, User, ChallengeResponse } from '../types/stellar';
+const BASE_URL = "http://studybae.online:8000/api"; 
 
-const API_URL = 'http://studybae.online:8000'; 
-
-async function fetchWithAuth(
-  endpoint: string, 
-  options: RequestInit = {}
-): Promise<any> {
-  const token = localStorage.getItem('authToken');
-  
-  const headers = {
-    'Content-Type': 'application/json',
-    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-    ...(options.headers || {})
-  };
-  
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
-    headers
-  });
-  
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'An error occurred' }));
-    throw new Error(error.message || 'Request failed');
-  }
-  
-  return response.json();
+interface AuthResponse {
+  message: string;
+  token?: string;
+  challenge?: ChallengeResponse;
 }
 
-export const authAPI = {
-  getChallenge: async (publicKey: string): Promise<ChallengeResponse> => {
-    return fetchWithAuth('/auth/challenge', {
-      method: 'POST',
-      body: JSON.stringify({ publicKey })
-    });
-  },
-  
-  verifyWallet: async (
-    publicKey: string, 
-    challenge: string, 
-    signature: string
-  ): Promise<AuthResponse> => {
-    return fetchWithAuth('/auth/wallet-verify', {
-      method: 'POST',
-      body: JSON.stringify({ publicKey, challenge, signature })
-    });
-  },
+interface ChallengeResponse {
+  type: string; // Example: "OTP", "Signature"
+  challengeToken: string;
+}
 
-  verifyToken: async (): Promise<{ valid: boolean }> => {
-    return fetchWithAuth('/auth/verify');
+// Connect Wallet for Login
+export const connectWalletLogin = async (): Promise<AuthResponse> => {
+  try {
+    // Get wallet address
+    const { address: publicKey, error } = await getPublicKey.getAddress();
+
+    if (error || !publicKey) throw new Error("Wallet connection failed");
+
+    const response = await fetch(`${BASE_URL}/wallet-login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ publicKey }),
+    });
+
+    return await response.json();
+  } catch (error: any) {
+    return { message: error.message };
   }
 };
 
-export const studentAPI = {
-  createProfile: async (profileData: Partial<User>): Promise<{ message: string }> => {
-    return fetchWithAuth('/students/profile', {
-      method: 'POST',
-      body: JSON.stringify(profileData)
-    });
-  },
+// Connect Wallet for Registration
+export const connectWalletRegister = async (email: string): Promise<AuthResponse> => {
+  try {
+    // Get wallet address
+    const { address: publicKey, error } = await getPublicKey.getAddress();
 
-  getProfile: async (): Promise<User> => {
-    return fetchWithAuth('/students/profile');
+    if (error || !publicKey) throw new Error("Wallet connection failed");
+
+    const response = await fetch(`${BASE_URL}/wallet-register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ publicKey, email }),
+    });
+
+    return await response.json();
+  } catch (error: any) {
+    return { message: error.message };
+  }
+};
+
+// Handle Signature Challenge Response
+export const submitSignatureChallenge = async (challengeToken: string): Promise<AuthResponse> => {
+  try {
+    // Sign challenge using Freighter
+    const signedTransaction = await signTransaction(challengeToken, { networkPassphrase: "Test SDF Network ; September 2015" });
+
+    const response = await fetch(`${BASE_URL}/verify-signature`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ signedTransaction }),
+    });
+
+    return await response.json();
+  } catch (error: any) {
+    return { message: error.message };
   }
 };

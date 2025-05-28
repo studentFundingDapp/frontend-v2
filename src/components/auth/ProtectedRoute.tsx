@@ -1,35 +1,26 @@
-// src/components/auth/ProtectedRoute.tsx
-
 import React from 'react';
-import { Navigate } from 'react-router-dom';
-import { useAuth } from './AuthContext';
+import type { ReactNode } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import WalletConnection from '../WalletConnection';
 
 interface ProtectedRouteProps {
-  children: React.ReactNode;
-  redirectTo?: string;
+  children: ReactNode;
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  children, 
-  redirectTo = '/login' 
-}) => {
-  const { isAuthenticated, isLoading } = useAuth();
-  
-  // Show loading indicator while checking authentication
-  if (isLoading) {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+  const { isAuthenticated, login } = useAuth();
+
+  if (!isAuthenticated) {
     return (
-      <div className="loading-container">
-        <div className="loading-spinner"></div>
-        <p>Loading...</p>  
+      <div className="auth-required">
+        <h2>Connect Your Wallet</h2>
+        <p>Please connect your Stellar wallet to continue</p>
+        <WalletConnection onConnect={login} />
       </div>
     );
   }
-  
-  // Redirect to login if not authenticated
-  if (!isAuthenticated) {
-    return <Navigate to={redirectTo} />;
-  }
-  
-  // Render the protected content if authenticated
+
   return <>{children}</>;
 };
+
+export default ProtectedRoute;
