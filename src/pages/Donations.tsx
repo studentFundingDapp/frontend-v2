@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+
+// Import your components and hooks
 import PageWrapper from "../components/PageWrapper";
 import DonorsList from "../components/donations/DonorsList";
 import EmptyStateBlock from "../components/donations/EmptyStateBlock";
@@ -9,117 +11,116 @@ import FundingSummaryCard from "../components/donations/FundingSummaryCard";
 import { useLoading } from "../context/LoadingContext";
 import { useToast } from "../hooks/use-toast";
 
-// Mock data for demonstration
-const mockDonationData = {
-  totalRaised: 3250,
-  totalDonors: 42,
-  averageDonation: 77.38,
-  targetAmount: 5000,
-  donors: [
-    {
-      id: "1",
-      avatarUrl: "/placeholder.svg",
-      donorName: "Alex Johnson",
-      amount: 500,
-      message: "This project is amazing! Keep up the great work.",
-      donatedAt: "2 hours ago",
-    },
-    {
-      id: "2",
-      avatarUrl: "/placeholder.svg",
-      donorName: "Anonymous",
-      amount: 100,
-      donatedAt: "1 day ago",
-    },
-    {
-      id: "3",
-      avatarUrl: "/placeholder.svg",
-      donorName: "Maria Garcia",
-      amount: 250,
-      message: "Happy to support student innovation!",
-      donatedAt: "3 days ago",
-    },
-    {
-      id: "4",
-      avatarUrl: "/placeholder.svg",
-      donorName: "David Kim",
-      amount: 75,
-      donatedAt: "1 week ago",
-    },
-    {
-      id: "5",
-      avatarUrl: "/placeholder.svg",
-      donorName: "Sarah Miller",
-      amount: 300,
-      message: "Looking forward to seeing the final product!",
-      donatedAt: "2 weeks ago",
-    },
-  ],
-  weeklyDonations: [
-    { day: "Mon", amount: 500 },
-    { day: "Tue", amount: 350 },
-    { day: "Wed", amount: 200 },
-    { day: "Thu", amount: 0 },
-    { day: "Fri", amount: 600 },
-    { day: "Sat", amount: 1200 },
-    { day: "Sun", amount: 400 },
-  ],
-};
+// Import your API client and types
+import { studentApi, fundingApi } from "../lib/api";
+import type { FundingTransaction } from "../lib/api"; // Adjust path if needed
 
-// Define interface for donor data
+// Interface for the data expected by the DonorsList component
 export interface DonorData {
   id: string;
-  avatarUrl: string;
-  donorName: string;
+  avatarUrl: string; // Will use a placeholder as this isn't in the API response
+  donorName: string; // Will use a placeholder
   amount: number;
   message?: string;
   donatedAt: string;
 }
 
+// Interface for the summary analytics data from the dashboard
+interface DonationSummary {
+  totalRaised: number;
+  totalDonors: number;
+  averageDonation: number;
+  targetAmount: number; // Assuming target is part of the dashboard/project data
+}
+
+// Interface for the weekly chart data
+interface WeeklyDonation {
+    day: string;
+    amount: number;
+}
+
 const DonationsPage = () => {
-  const { loading, setLoading } = useLoading();
-  const [ready, setReady] = useState(false);
-  const [hasDonations, setHasDonations] = useState<boolean>(true);
-  const [donationData] = useState(mockDonationData);
-  useToast();
+  const { setLoading } = useLoading();
+  const { toast } = useToast();
 
-  // Simulate checking for donations
-  useEffect(() => {
-    // In a real app, this would come from an API
-    setHasDonations(donationData.donors.length > 0);
-  }, [donationData.donors.length]);
+  const [summary, setSummary] = useState<DonationSummary | null>(null);
+  const [donors, setDonors] = useState<FundingTransaction[]>([]);
+  const [weeklyData, setWeeklyData] = useState<WeeklyDonation[]>([]);
 
-  useEffect(() => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
-    const timer = setTimeout(() => {
+    try {
+      const [dashboardResponse, fundingHistoryResponse] = await Promise.all([
+        studentApi.getDashboard(),
+        fundingApi.getStudentHistory(),
+      ]);
+
+      // Process Dashboard Data for Summary and Chart
+      if (dashboardResponse.success) {
+        // NOTE: The structure of dashboardResponse.data is assumed.
+        // You MUST adjust the property access (e.g., apiData.totalFunding)
+        // to match what your actual backend API returns.
+        const apiData = dashboardResponse.data as any;
+        setSummary({
+          totalRaised: apiData.totalRaised || 0,
+          totalDonors: apiData.totalDonors || 0,
+          averageDonation: apiData.averageDonation || 0,
+          targetAmount: apiData.targetAmount || 5000, // Fallback target
+        });
+        setWeeklyData(apiData.weeklyDonations || []);
+      } else {
+        toast({
+          title: "Error",
+          description: "Could not fetch dashboard summary.",
+          variant: "destructive",
+        });
+      }
+
+      // Process Funding History for Donors List
+      if (fundingHistoryResponse.success) {
+        setDonors(fundingHistoryResponse.data);
+      } else {
+        toast({
+          title: "Error",
+          description: "Could not fetch donation history.",
+          variant: "destructive",
+        });
+      }
+
+    } catch (error) {
+      toast({
+        title: "Network Error",
+        description: "Failed to connect to the server. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
       setLoading(false);
-      setReady(true);
-    }, 1000); // Simulate 1s loading
-    return () => clearTimeout(timer);
-  }, [setLoading]);
+    }
+  }, [setLoading, toast]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Map the raw transaction data to the format expected by the DonorsList component
+  const mappedDonors: DonorData[] = donors.map(tx => ({
+    id: tx.id,
+    avatarUrl: "/placeholder.svg", // Placeholder, as API doesn't provide this
+    donorName: `Donor #${tx.donor_id.slice(0, 6)}...`, // Anonymized donor name
+    amount: tx.amount,
+    message: tx.message,
+    donatedAt: new Date(tx.timestamp).toLocaleDateString(),
+  }));
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
+    visible: { opacity: 1, transition: { staggerChildren: 0.15 } },
   };
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5 },
-    },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   };
-
-  if (loading || !ready) {
-    return null; // Let your global loading overlay handle the spinner
-  }
 
   return (
     <PageWrapper>
@@ -130,46 +131,41 @@ const DonationsPage = () => {
         animate="visible"
       >
         <motion.h1
-          className="text-3xl font-bold mb-8 text-center"
+          className="text-3xl font-bold mb-8 text-center text-gray-800 dark:text-gray-100"
           variants={itemVariants}
         >
           Your Donations Dashboard
         </motion.h1>
 
-        {hasDonations ? (
+        {donors.length > 0 && summary ? (
           <>
             <motion.div variants={itemVariants}>
               <FundingSummaryCard
-                totalRaised={donationData.totalRaised}
-                totalDonors={donationData.totalDonors}
-                averageDonation={donationData.averageDonation}
-                targetAmount={donationData.targetAmount}
+                totalRaised={summary.totalRaised}
+                totalDonors={summary.totalDonors}
+                averageDonation={summary.averageDonation}
+                targetAmount={summary.targetAmount}
               />
             </motion.div>
 
-            <motion.div
-              className="my-8"
-              variants={itemVariants}
-            >
+            <motion.div className="my-8" variants={itemVariants}>
               <FundingProgressChart
-                weeklyData={donationData.weeklyDonations}
-                targetAmount={donationData.targetAmount}
+                weeklyData={weeklyData}
+                targetAmount={summary.targetAmount}
               />
             </motion.div>
 
             <motion.div variants={itemVariants}>
-              <h2 className="text-2xl font-semibold mb-4">Recent Donors</h2>
-              <DonorsList donors={donationData.donors} />
+              <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Recent Donors</h2>
+              <DonorsList donors={mappedDonors} />
             </motion.div>
 
-            <motion.div
-              className="mt-12"
-              variants={itemVariants}
-            >
+            <motion.div className="mt-12" variants={itemVariants}>
               <EngagementFooter />
             </motion.div>
           </>
         ) : (
+          // Show empty state only after loading is complete and if there's no data
           <motion.div variants={itemVariants}>
             <EmptyStateBlock />
           </motion.div>

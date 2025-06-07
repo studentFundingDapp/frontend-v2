@@ -4,111 +4,97 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { z } from "zod";
+
+// Import your type-safe API client
+// import { studentApi } from "../api/client"; // Adjust the path to your api client file
+
 import AuthLayout2 from "../components/AuthLayout2";
 import { Button } from "../components/ui/button";
 import { Checkbox } from "../components/ui/checkbox";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../components/ui/form";
 import { Input } from "../components/ui/input";
+import { studentApi } from "../lib/api";
 
-const registerSchema = z.object({
-  username: z.string().min(3, "Username is required"),
-  email: z.string().email("Enter a valid email"),
-  full_name: z.string().min(3, "Full name is required"),
-  wallet_address: z.string().min(10, "Wallet address is required"),
-  role: z.enum(["student", "donor", "admin"], { message: "Select a valid role" }),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  confirmPassword: z.string().min(6, "Password must be at least 6 characters"),
-    terms: z.boolean().refine((val: boolean) => val === true, {
-    message: "You must accept the terms and conditions",
-  }),
-  }).refine((data: { password: string; confirmPassword: string }) => data.password === data.confirmPassword, {
+// 1. Updated Schema to match the StudentRegistrationRequest interface
+const registerStudentSchema = z
+  .object({
+    username: z.string().min(3, "Username must be at least 3 characters"),
+    email: z.string().email("Please enter a valid email address"),
+    full_name: z.string().min(3, "Full name is required"),
+    institution: z.string().min(3, "Institution name is required"),
+    student_id: z.string().min(1, "Student ID is required"),
+    field_of_study: z.string().min(3, "Field of study is required"),
+    // Use z.coerce to safely convert the input string to a number for validation
+    year_of_study: z.coerce
+      .number({ invalid_type_error: "Year must be a number" })
+      .min(1, "Please enter a valid year"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    confirmPassword: z.string().min(6, "Password must be at least 6 characters"),
+    terms: z.boolean().refine((val) => val === true, {
+      message: "You must accept the terms and conditions",
+    }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
     path: ["confirmPassword"],
   });
 
+type RegisterStudentValues = z.infer<typeof registerStudentSchema>;
 
-type RegisterValues = z.infer<typeof registerSchema>;
-
-interface RegisterProps {
-  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-// eslint-disable-next-line no-empty-pattern
-const Register = ({ }: RegisterProps) => {
+const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
-  // Removed unused apiError state
+  const [apiError, setApiError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const form = useForm<RegisterValues>({
-    resolver: zodResolver(registerSchema),
+  const form = useForm<RegisterStudentValues>({
+    resolver: zodResolver(registerStudentSchema),
     defaultValues: {
       username: "",
       email: "",
       full_name: "",
-      wallet_address: "",
-      role: "student", // default selected option
+      institution: "",
+      student_id: "",
+      field_of_study: "",
+      year_of_study: undefined, // Initialize as undefined for number inputs
       password: "",
       confirmPassword: "",
       terms: false,
     },
   });
 
-  const onSubmit = async (data: RegisterValues) => {
+  // 2. Updated onSubmit to use the type-safe studentApi client
+  const onSubmit = async (data: RegisterStudentValues) => {
     setIsLoading(true);
     setApiError(null);
 
-    try {
-      // Log the request payload for debugging
-    console.log("Request payload:", {
+    // The API client handles sending the correct payload.
+    // We don't need to manually pick fields like 'confirmPassword' or 'terms'.
+    const response = await studentApi.register({
       email: data.email,
-      username: data.username,
       password: data.password,
+      username: data.username,
       full_name: data.full_name,
-      wallet_address: data.wallet_address,
-      role: data.role,
+      institution: data.institution,
+      student_id: data.student_id,
+      field_of_study: data.field_of_study,
+      year_of_study: data.year_of_study,
     });
-      // Call the API to register the user
-      const response = await fetch("http://studybae.online:8000/api/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: data.email,
-          username: data.username,
-          password: data.password,
-          full_name: data.full_name,
-          wallet_address: data.wallet_address,
-          role: data.role,
-        }),
-      });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: "Registration failed" }));
-        console.error("Backend error response:", errorData);
-        throw new Error(errorData.message || "Registration failed");
-      }
+    setIsLoading(false);
 
-      await response.json();
-
-      // Show success message
-      toast.success("Registration successful! Please login with your credentials");
-
-      // Redirect to login after registration
-      setTimeout(() => navigate("/login"), 1000);
-    } catch (error) {
-      console.error("Registration error:", error);
-
-      // Check if it's a network error
-      if (error instanceof TypeError && error.message === "Failed to fetch") {
-        setApiError("Unable to connect to the server. Please check your internet connection or try using HTTP instead of HTTPS.");
-        toast.error("Connection error. Server may be unavailable.");
-      } else {
-        setApiError(error instanceof Error ? error.message : "Failed to register. Please try again.");
-        toast.error(error instanceof Error ? error.message : "Failed to register. Please try again.");
-      }
-    } finally {
-      setIsLoading(false);
+    if (response.success) {
+      toast.success("Registration successful! Please check your email to verify your account.");
+      setTimeout(() => navigate("/login"), 1500);
+    } else {
+      setApiError(response.error);
+      toast.error(response.error);
     }
   };
 
@@ -116,28 +102,45 @@ const Register = ({ }: RegisterProps) => {
     <AuthLayout2>
       <div className="mb-8 flex flex-col items-center">
         <h1 className="text-2xl md:text-3xl font-bold text-center text-gray-900 dark:text-white mb-2">
-          Create your account
+          Create your Student Account 🧑‍🎓
         </h1>
         <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
-          Join DSFS to access student funding opportunities
+          Join to access student funding opportunities.
         </p>
       </div>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="username"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Username</FormLabel>
-                <FormControl>
-                  <Input disabled={isLoading} placeholder="john_doe" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {/* 3. Form fields updated to match the new schema */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="full_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="John Doe" disabled={isLoading} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input disabled={isLoading} placeholder="john_doe" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
           <FormField
             control={form.control}
             name="email"
@@ -151,84 +154,99 @@ const Register = ({ }: RegisterProps) => {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="full_name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Full Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="John Doe" disabled={isLoading} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="wallet_address"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Wallet Address</FormLabel>
-                <FormControl>
-                  <Input placeholder="0x123456789abcdef" disabled={isLoading} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="role"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Role</FormLabel>
-                <FormControl>
-                  <select
-                    {...field}
-                    disabled={isLoading}
-                    className="w-full border border-gray-300 rounded-md p-2 dark:bg-gray-800 dark:text-white"
-                  >
-                    <option value="student">Student</option>
-                    <option value="donor">Donor</option>
-                    <option value="admin">Admin</option>
-                  </select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input placeholder="Create a password" type="password" disabled={isLoading} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="confirmPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Confirm Password</FormLabel>
-                <FormControl>
-                  <Input placeholder="Confirm your password" type="password" disabled={isLoading} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="institution"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Institution</FormLabel>
+                  <FormControl>
+                    <Input placeholder="University of Example" disabled={isLoading} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="student_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Student ID</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Your student ID" disabled={isLoading} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="field_of_study"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Field of Study</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., Computer Science" disabled={isLoading} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="year_of_study"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Year of Study</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="e.g., 3" disabled={isLoading} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Create a password" type="password" disabled={isLoading} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Confirm your password" type="password" disabled={isLoading} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
           <FormField
             control={form.control}
             name="terms"
             render={({ field }) => (
-              <FormItem className="flex items-start space-x-3">
+              <FormItem className="flex items-start space-x-3 pt-2">
                 <FormControl>
                   <Checkbox checked={field.value} onCheckedChange={field.onChange} disabled={isLoading} />
                 </FormControl>
@@ -237,10 +255,6 @@ const Register = ({ }: RegisterProps) => {
                     I agree to the{" "}
                     <Link to="/terms" className="text-blue-600 dark:text-blue-400 hover:underline">
                       Terms of Service
-                    </Link>{" "}
-                    and{" "}
-                    <Link to="/privacy" className="text-blue-600 dark:text-blue-400 hover:underline">
-                      Privacy Policy
                     </Link>
                   </FormLabel>
                   <FormMessage />
@@ -248,8 +262,11 @@ const Register = ({ }: RegisterProps) => {
               </FormItem>
             )}
           />
+          
+          {apiError && <p className="text-sm text-red-500 text-center">{apiError}</p>}
+
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Creating account..." : "Create account"}
+            {isLoading ? "Creating Account..." : "Create Account"}
           </Button>
         </form>
       </Form>
@@ -258,7 +275,7 @@ const Register = ({ }: RegisterProps) => {
         <p className="text-sm text-gray-600 dark:text-gray-400">
           Already have an account?{" "}
           <Link to="/login" className="font-medium text-blue-600 dark:text-blue-400 hover:underline">
-            Sign in
+            Sign In
           </Link>
         </p>
       </div>
@@ -267,8 +284,3 @@ const Register = ({ }: RegisterProps) => {
 };
 
 export default Register;
-
-function setApiError(arg0: string | null) {
-  console.error(arg0); // Log the error for debugging
-}
-

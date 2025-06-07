@@ -122,6 +122,7 @@ export interface DonorProfile {
 }
 
 export interface Project {
+    likesCount(likesCount: any): [any, any];
     project_id: string;
     student_id: string;
     title: string;
@@ -132,6 +133,7 @@ export interface Project {
     deadline: string;
     status: 'open' | 'funded' | 'completed' | 'closed';
     created_at: string;
+    media_urls?: string[];
 }
 
 export interface FundingTransaction {

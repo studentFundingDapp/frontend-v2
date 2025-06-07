@@ -1,62 +1,41 @@
 import { motion } from "framer-motion";
-import { Bookmark, Eye, Heart, Share2,DollarSign } from "lucide-react";
+import { Bookmark, DollarSign, Eye, Heart, Share2 } from "lucide-react";
 import { useState } from "react";
-import { cn } from "../lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Button } from "./ui/button";
-import { Card } from "./ui/card";
 import { useNavigate } from "react-router-dom";
 import * as Tooltip from "@radix-ui/react-tooltip";
 
-interface Comment {
-  user: string;
-  text: string;
-}
-interface StudentDetails {
-  name: string;
-  degree?: string;
-  university?: string;
-  avatarUrl?: string;
-}
+// Local Imports
+import { cn } from "../lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Button } from "./ui/button";
 
+// Import the single source of truth for the Project type
+// import { Project } from "../api/client"; // Adjust path to your API client
+import { Card } from "./ui/card";
+import type { Project } from "../lib/api";
+
+// The component's props are simplified to just the project and an optional handler
 export interface ProjectCardProps {
-  projectName: string;
-  description: string;
-  imageUrl?: string;
-  timestamp: string;
-  location?: string;
-  tags?: string[];
-  likesCount: number;
-  comments?: Comment[];
-  student?: StudentDetails;
-  buttonText?: string;
-  onClick?: () => void;
-  fundingCurrent: number;
-  fundingTarget: number;
+  project: Project;
+  onButtonClick?: () => void;
 }
-
 
 const ProjectCard: React.FC<ProjectCardProps> = ({
-  projectName,
-  description,
-  imageUrl,
-  timestamp,
-  location,
-  tags = [],
-  likesCount = 0,
-  student,
-  onClick,
-  fundingCurrent,
-  fundingTarget,
+  project,
+  onButtonClick,
 }) => {
+  const navigate = useNavigate();
+  
+  // State for UI interactions (likes, saves)
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [currentLikes, setCurrentLikes] = useState(likesCount);
+  // Use a placeholder for likes since it's not on the Project type from the backend
+  const [likesCount, setLikesCount] = useState(Math.floor(Math.random() * 100));
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
     setLiked(!liked);
-    setCurrentLikes(liked ? currentLikes - 1 : currentLikes + 1);
+    setLikesCount(liked ? likesCount - 1 : likesCount + 1);
   };
 
   const handleSave = (e: React.MouseEvent) => {
@@ -66,188 +45,127 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
 
   const handleShare = (e: React.MouseEvent) => {
     e.stopPropagation();
-    alert("Share functionality would open here");
+    // In a real app, this would trigger the Web Share API or a share modal
+    navigator.clipboard.writeText(`${window.location.origin}/projects/${project.project_id}`);
+    alert("Project link copied to clipboard!");
   };
 
   const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase();
+    return name?.split(" ").map((n) => n[0]).join("").toUpperCase() || "S";
   };
-
+  
+  // Utility for tag styling
   const getTagColor = (tag: string) => {
-    const lowerTag = tag.toLowerCase();
-    if (lowerTag === "approved") return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
-    if (lowerTag === "pending") return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300";
-    if (lowerTag === "rejected") return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300";
-    if (lowerTag === "completed") return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
-    if (lowerTag === "medical") return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300";
+    const lowerTag = tag?.toLowerCase();
+    if (lowerTag === "funded" || lowerTag === "completed") return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
+    if (lowerTag === "open") return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300";
+    if (lowerTag === "closed") return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300";
     if (lowerTag === "technology") return "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300";
-    if (lowerTag === "business") return "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300";
-    if (lowerTag === "environment") return "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300";
-    if (lowerTag === "education") return "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300";
-    if (lowerTag === "arts") return "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300";
-    if (lowerTag === "social") return "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300";
+    if (lowerTag === "medical") return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300";
     return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
   };
+  
+  // Calculate funding progress
+  const progress = project.target_amount > 0 
+    ? Math.min((project.current_amount / project.target_amount) * 100, 100) 
+    : 0;
 
-  const navigate = useNavigate();
-  const progress = fundingTarget > 0 ? Math.min((fundingCurrent / fundingTarget) * 100, 100) : 0;
+  // Assume student info might be attached to the project object in the future
+  const studentName = "Student User"; // Replace with project.student.name if available
+  const studentAvatar = ""; // Replace with project.student.avatar if available
+
+  // Use the project's media_urls array for the image, defaulting to the first one
+  const imageUrl = project.media_urls?.[0];
 
   return (
     <motion.div
-      className="h-full"
+      className="h-full group"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       whileHover={{ y: -5, transition: { duration: 0.2 } }}
     >
       <Card 
-        className="project-card h-full flex flex-col cursor-pointer shadow-sm hover:shadow-md dark:shadow-gray-900/20 dark:bg-gray-800/80 dark:border-gray-700" 
-        onClick={onClick}
+        className="h-full flex flex-col cursor-pointer shadow-sm hover:shadow-lg dark:shadow-gray-900/20 dark:bg-gray-800/80 dark:border-gray-700 transition-shadow duration-300" 
+        onClick={onButtonClick}
       >
-        {/* Card Header */}
         <div className="p-3 flex items-center justify-between border-b border-gray-100 dark:border-gray-700">
-          <div className="flex items-center space-x-2">
-            <Avatar className="h-8 w-8 ring-2 ring-white dark:ring-gray-800 shadow-sm">
-              <AvatarImage src={student?.avatarUrl} alt={student?.name || projectName} />
+          <div className="flex items-center space-x-2 overflow-hidden">
+            <Avatar className="h-8 w-8 ring-2 ring-white dark:ring-gray-800 shadow-sm flex-shrink-0">
+              <AvatarImage src={studentAvatar} alt={studentName} />
               <AvatarFallback className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                {student ? getInitials(student.name) : projectName[0].toUpperCase()}
+                {getInitials(studentName)}
               </AvatarFallback>
             </Avatar>
-            
-            <div>
-              <p className="font-medium text-sm text-gray-900 dark:text-gray-100 line-clamp-1">{student?.name || projectName}</p>
-              {location && (
-                <p className="text-xs text-gray-500 dark:text-gray-400">{location}</p>
-              )}
+            <div className="truncate">
+              <p className="font-medium text-sm text-gray-900 dark:text-gray-100 truncate">{studentName}</p>
             </div>
           </div>
-          
-          <span className="text-xs text-gray-400 dark:text-gray-500">{timestamp}</span>
+          <span className="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0 ml-2">
+            {new Date(project.created_at).toLocaleDateString()}
+          </span>
         </div>
         
-        {/* Media Content - Fixed aspect ratio for consistent height */}
         <div className="aspect-video w-full relative overflow-hidden bg-gray-100 dark:bg-gray-800">
           {imageUrl ? (
-            <img 
-              src={imageUrl} 
-              alt={projectName} 
-              className="w-full h-full object-cover"
-              loading="lazy"
-            />
+            <img src={imageUrl} alt={project.title} className="w-full h-full object-cover" loading="lazy" />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-50 dark:from-blue-900/30 dark:to-blue-800/20">
-              <span className="text-4xl font-bold text-blue-300 dark:text-blue-700">{projectName[0]}</span>
+              <span className="text-4xl font-bold text-blue-300 dark:text-blue-700">{getInitials(project.title)}</span>
             </div>
           )}
-          
-          {/* Overlay with view button */}
-          <div className="absolute inset-0 bg-black bg-opacity-0 flex items-center justify-center opacity-0 transition-all group-hover:bg-opacity-30 hover:bg-opacity-30 hover:opacity-100">
+          <div className="absolute inset-0 bg-black bg-opacity-0 flex items-center justify-center opacity-0 group-hover:bg-opacity-30 group-hover:opacity-100 transition-all">
             <Button variant="secondary" size="sm" className="bg-white/90 text-gray-800 hover:bg-white dark:bg-gray-800/90 dark:text-gray-100 dark:hover:bg-gray-800 shadow-md rounded-full">
               <Eye className="h-4 w-4 mr-1" /> View Details
             </Button>
           </div>
         </div>
         
-        {/* Project Info - Fixed height content for consistency */}
-        <div className="p-4 flex-grow flex flex-col min-h-[150px]">
-          <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1 line-clamp-1">{projectName}</h3>
+        <div className="p-4 flex-grow flex flex-col">
+          <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1 line-clamp-1">{project.title}</h3>
+          <p className="text-sm text-gray-700 dark:text-gray-300 mb-3 line-clamp-2 min-h-[40px]">{project.description}</p>
           
-          <p className="text-sm text-gray-700 dark:text-gray-300 mb-3 line-clamp-2">
-            {description}
-          </p>
+          <div className="mt-auto mb-3 flex flex-wrap gap-1">
+            {[project.category, project.status].filter(Boolean).map((tag, index) => (
+              <span key={index} className={cn("text-xs font-medium px-2 py-0.5 rounded-full", getTagColor(tag))}>{tag}</span>
+            ))}
+          </div>
           
-          {/* Tags */}
-          {tags.length > 0 && (
-            <div className="mt-auto mb-3 flex flex-wrap gap-1">
-              {tags.map((tag, index) => (
-                <span 
-                  key={index} 
-                  className={cn("text-2xs px-2 py-0.5 rounded-full", getTagColor(tag))}
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-          
-          {/* Funding Progress Bar */}
-          <Tooltip.Provider>
-  <Tooltip.Root>
-    <Tooltip.Trigger asChild>
-      <div className="relative w-full cursor-pointer group">
-        <div className="w-full h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-blue-500 rounded-full transition-all duration-300"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      </div>
-    </Tooltip.Trigger>
-    <Tooltip.Portal>
-      <Tooltip.Content
-        side="top"
-        align="center"
-        className="px-2 py-1 bg-gray-900 text-white text-xs rounded shadow-lg z-50"
-        sideOffset={6}
-      >
-        {fundingCurrent && fundingTarget
-          ? `${fundingCurrent} / ${fundingTarget} XLM`
-          : "No funding data"}
-        <Tooltip.Arrow className="fill-gray-900" />
-      </Tooltip.Content>
-    </Tooltip.Portal>
-  </Tooltip.Root>
-</Tooltip.Provider>
+          <Tooltip.Provider delayDuration={100}>
+            <Tooltip.Root>
+              <Tooltip.Trigger asChild>
+                <div className="relative w-full cursor-pointer">
+                  <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <motion.div className="h-full bg-blue-500 rounded-full" style={{ width: `${progress}%` }} initial={{ width: 0 }} animate={{ width: `${progress}%` }} />
+                  </div>
+                </div>
+              </Tooltip.Trigger>
+              <Tooltip.Portal>
+                <Tooltip.Content side="top" align="center" className="px-2 py-1 bg-gray-900 text-white text-xs rounded shadow-lg z-50" sideOffset={6}>
+                  {`${project.current_amount.toLocaleString()} / ${project.target_amount.toLocaleString()} XLM Raised`}
+                  <Tooltip.Arrow className="fill-gray-900" />
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            </Tooltip.Root>
+          </Tooltip.Provider>
 
-          {/* Action Buttons */}
-          <div className="mt-auto flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-3">
-            <div className="flex space-x-3">
-              <button 
-                className="flex items-center text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 text-sm" 
-                onClick={handleLike}
-              >
-                <Heart 
-                  className={cn("h-4 w-4 mr-1", 
-                    liked ? "fill-red-500 text-red-500" : ""
-                  )} 
-                />
-                {currentLikes}
+          <div className="mt-4 flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-3">
+            <div className="flex space-x-4">
+              <button className="flex items-center text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 text-sm transition-colors" onClick={handleLike}>
+                <Heart className={cn("h-4 w-4 mr-1.5 transition-all", liked ? "fill-red-500 text-red-500" : "")} />
+                {likesCount}
               </button>
-              
-              <button 
-                className="flex items-center text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 text-sm" 
-                onClick={handleShare}
-              >
-                <Share2 className="h-4 w-4 mr-1" />
+              <button className="flex items-center text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 text-sm transition-colors" onClick={(e) => { e.stopPropagation(); navigate(`/donate/${project.project_id}`); }}>
+                <DollarSign className="h-4 w-4 mr-1.5" />
+                Fund
+              </button>
+              <button className="flex items-center text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 text-sm transition-colors" onClick={handleShare}>
+                <Share2 className="h-4 w-4 mr-1.5" />
                 Share
               </button>
-
-              <button 
-  className="flex items-center text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 text-sm"
-  onClick={(e) => {
-    e.stopPropagation();
-    navigate("/donate"); // replace with the actual donate route if different
-  }}
->
-  <DollarSign className="h-4 w-4 mr-1" />
-  Fund
-</button>
-
             </div>
-            
-            <button 
-              className="text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400" 
-              onClick={handleSave}
-            >
-              <Bookmark 
-                className={cn("h-5 w-5", 
-                  saved ? "fill-blue-500 text-blue-500" : ""
-                )} 
-              />
+            <button className="text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors" onClick={handleSave}>
+              <Bookmark className={cn("h-5 w-5 transition-all", saved ? "fill-blue-500 text-blue-500" : "")} />
             </button>
           </div>
         </div>

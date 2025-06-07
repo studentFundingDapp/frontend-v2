@@ -14,6 +14,8 @@ import DashboardD from "./pages/DashboardD";
 import DonorNavBar from "./components/DonorNavBar";
 import Donate from "./pages/Donate";
 import ExploreStudents from "./pages/ExploreStudents";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 // Removed PrivateRoute and authentication logic for deployment/demo
 function App() {
@@ -56,10 +58,10 @@ function AppContent() {
           <Route path="/students" element={<ExploreStudents />} />
 
           {/* Authentication pages (commented out for production/demo) */}
-          {/*
+          
           <Route path="/login" element={<Login setIsAuthenticated={() => {}} />} />
-          <Route path="/register" element={<Register setIsAuthenticated={() => {}} />} />
-          */}
+          <Route path="/register" element={<Register />} />
+         
 
           {/* Default route: redirect to dashboard */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
