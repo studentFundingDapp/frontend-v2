@@ -1,153 +1,155 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
-import { toast } from "sonner";
-import { z } from "zod";
-import AuthLayout2 from "../components/AuthLayout2";
-import { Button } from "../components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../components/ui/form";
-import { Input } from "../components/ui/input";
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { connectFreighterWallet, checkFreighterAvailability } from '../utils/freighter';
 
-const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
-
-type LoginValues = z.infer<typeof loginSchema>;
-
-// eslint-disable-next-line no-empty-pattern
-const Login = ({ }: { setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>> }) => {
-  const [isLoading, setIsLoading] = useState(false);
+const Login: React.FC = () => {
+  const { isAuthenticated, login, user } = useAuth();
   const navigate = useNavigate();
+  const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isFreighterAvailable, setIsFreighterAvailable] = useState(false);
 
-  const form = useForm<LoginValues>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
 
-  const onSubmit = async (data: LoginValues) => {
-  setIsLoading(true);
-  try {
-    const res = await fetch("http://studybae.online:8000/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: data.email,
-        password: data.password,
-      }),
-    });
+  useEffect(() => {
+    const checkWallet = async () => {
+      const available = await checkFreighterAvailability();
+      setIsFreighterAvailable(available);
+    };
+    checkWallet();
+  }, []);
 
-    let result: unknown = {};
+  const handleRoleSelection = (role: string) => {
+    setSelectedRole(role);
+    setError(null);
+  };
+
+  const handleWalletConnect = async () => {
+    if (!selectedRole) {
+      setError("Please select a role before connecting your wallet.");
+      return;
+    }
+
+    setIsConnecting(true);
+    setError(null);
+
     try {
-      result = await res.json();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (jsonError) {
-      // If response is not JSON, fallback to text
-      const text = await res.text();
-      result = { message: text || "Unknown error" };
+      const walletData = await connectFreighterWallet();
+      login(walletData.publicKey, walletData.network);
+      navigate('/dashboard');
+    } catch (err: any) {
+      setError("Failed to connect wallet. Please try again.");
+    } finally {
+      setIsConnecting(false);
     }
+  };
 
-    if (!res.ok) {
-      console.error("Login failed:", result);
-      const errorMessage =
-        typeof result === "object" && result !== null && "message" in result
-          ? (result as { message?: string }).message
-          : undefined;
-      throw new Error(errorMessage || "Invalid email or password");
-    }
+  const handleAdminLogin = (event: React.FormEvent) => {
+    event.preventDefault();
 
-    // OPTIONAL: Store JWT or user info
-    const { token, user } = result as { token: string; user?: { role?: string } };
-    localStorage.setItem("token", token);
-    localStorage.setItem("userRole", user?.role || "");
-
-    toast.success("Login successful!");
-    navigate("/dashboard");
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : "Failed to login. Please check your credentials.";
-    toast.error(errorMessage);
-    console.error("Login error:", error);
-  } finally {
-    setIsLoading(false);
-  }
-};
-  
+    navigate('/admin-panel');
+  };
 
   return (
-    <AuthLayout2>
-      <div className="flex flex-col md:flex-row w-full max-w-6xl mx-auto">
-        {/* Auth Form */}
-        <div className="w-full md:w-1/2 p-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-center text-gray-900 dark:text-white mb-4">
-            Welcome back
-          </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-6">
-            Sign in to your account to continue
-          </p>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4 py-8">
+      <div className="w-full max-w-md bg-white shadow-xl rounded-lg p-8">
+       
+        <p className="text-sm text-gray-500 text-center mt-2">
+          Select your role and login to the platform.
+        </p>
 
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="you@example.com" type="email" disabled={isLoading} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+        {/* Role Selection */}
+        <div className="mt-6 flex justify-center space-x-4">
+          <button
+            onClick={() => handleRoleSelection("student")}
+            className={`px-4 py-2 rounded-md transition ${selectedRole === "student" ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-700"}`}
+          >
+            Student
+          </button>
+          <button
+            onClick={() => handleRoleSelection("donor")}
+            className={`px-4 py-2 rounded-md transition ${selectedRole === "donor" ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-700"}`}
+          >
+            Donor
+          </button>
+          <button
+            onClick={() => handleRoleSelection("admin")}
+            className={`px-4 py-2 rounded-md transition ${selectedRole === "admin" ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-700"}`}
+          >
+            Admin
+          </button>
+        </div>
 
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input placeholder="••••••••" type="password" disabled={isLoading} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Signing in..." : "Sign in"}
-              </Button>
-            </form>
-          </Form>
-
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Don't have an account?{" "}
-              <Link to="/register" className="font-medium text-blue-600 dark:text-blue-400 hover:underline">
-                Sign up
-              </Link>
-            </p>
+        {/* Error Message */}
+        {error && (
+          <div className="mt-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded-md text-sm">
+            {error}
           </div>
+        )}
+
+        {/* Wallet Connection for Students & Donors */}
+        {selectedRole && selectedRole !== "admin" && (
+          <div className="mt-6">
+            {!isFreighterAvailable ? (
+              <div className="text-center">
+                <p className="text-sm text-gray-600 mb-4">
+                  Freighter wallet is required to login.
+                </p>
+                <button
+                  onClick={() => window.open('https://freighter.app/', '_blank')}
+                  className="w-full px-4 py-3 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition font-medium"
+                >
+                  Install Freighter Wallet
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={handleWalletConnect}
+                disabled={isConnecting}
+                className="w-full px-4 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:bg-indigo-400 transition font-medium flex items-center justify-center"
+              >
+                {isConnecting ? "Connecting..." : "Connect Freighter Wallet"}
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Admin Login Form */}
+        {selectedRole === "admin" && (
+          <form onSubmit={handleAdminLogin} className="mt-6">
+            <input type="email" placeholder="Admin Email" className="w-full px-4 py-3 border rounded-md mb-2" required />
+            <input type="password" placeholder="Password" className="w-full px-4 py-3 border rounded-md mb-2" required />
+            <button type="submit" className="w-full px-4 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition font-medium">
+              Login as Admin
+            </button>
+          </form>
+        )}
+
+        {/* Redirect to Registration */}
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-600">New to the platform?</p>
+          <button
+            onClick={() => navigate('/register')}
+            className="mt-2 px-4 py-2 text-sm font-medium bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition"
+          >
+            Create Student Profile
+          </button>
         </div>
 
-        {/* Reasons to Trust DSFS */}
-        <div className="hidden md:flex w-full md:w-1/2 flex-col justify-center items-center bg-gray-50 dark:bg-gray-800 p-6">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Why Choose DSFS?</h2>
-          <ul className="space-y-4 text-gray-700 dark:text-gray-300">
-            <li>✔️ Transparent blockchain-based funding.</li>
-            <li>✔️ Fast and secure transactions.</li>
-            <li>✔️ Empowering students globally.</li>
-          </ul>
-        </div>
+        {/* Display User Info When Connected */}
+        {user && (
+          <div className="mt-6 p-3 bg-green-50 border border-green-200 rounded-md text-center">
+            <p className="text-xs text-green-700">Connected as: {user.publicKey?.substring(0, 12)}...</p>
+          </div>
+        )}
       </div>
-    </AuthLayout2>
+    </div>
   );
 };
 

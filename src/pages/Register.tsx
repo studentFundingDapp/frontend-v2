@@ -1,274 +1,147 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
-import { toast } from "sonner";
-import { z } from "zod";
-import AuthLayout2 from "../components/AuthLayout2";
-import { Button } from "../components/ui/button";
-import { Checkbox } from "../components/ui/checkbox";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../components/ui/form";
-import { Input } from "../components/ui/input";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { connectFreighterWallet} from "../utils/freighter";
 
-const registerSchema = z.object({
-  username: z.string().min(3, "Username is required"),
-  email: z.string().email("Enter a valid email"),
-  full_name: z.string().min(3, "Full name is required"),
-  wallet_address: z.string().min(10, "Wallet address is required"),
-  role: z.enum(["student", "donor", "admin"], { message: "Select a valid role" }),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  confirmPassword: z.string().min(6, "Password must be at least 6 characters"),
-    terms: z.boolean().refine((val: boolean) => val === true, {
-    message: "You must accept the terms and conditions",
-  }),
-  }).refine((data: { password: string; confirmPassword: string }) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-  });
-
-
-type RegisterValues = z.infer<typeof registerSchema>;
-
-interface RegisterProps {
-  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-// eslint-disable-next-line no-empty-pattern
-const Register = ({ }: RegisterProps) => {
-  const [isLoading, setIsLoading] = useState(false);
-  // Removed unused apiError state
+const Register: React.FC = () => {
   const navigate = useNavigate();
 
-  const form = useForm<RegisterValues>({
-    resolver: zodResolver(registerSchema),
-    defaultValues: {
-      username: "",
-      email: "",
-      full_name: "",
-      wallet_address: "",
-      role: "student", // default selected option
-      password: "",
-      confirmPassword: "",
-      terms: false,
-    },
+  const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    institution: "",
+    yearOfStudy: "",
+    course: "",
+    country: "",
+    bio: "",
+    password: "",
   });
 
-  const onSubmit = async (data: RegisterValues) => {
-    setIsLoading(true);
-    setApiError(null);
+  const handleRoleSelection = (role: string) => setSelectedRole(role);
 
+  const handleWalletConnect = async () => {
+    setIsConnecting(true);
     try {
-      // Log the request payload for debugging
-    console.log("Request payload:", {
-      email: data.email,
-      username: data.username,
-      password: data.password,
-      full_name: data.full_name,
-      wallet_address: data.wallet_address,
-      role: data.role,
-    });
-      // Call the API to register the user
-      const response = await fetch("http://studybae.online:8000/api/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: data.email,
-          username: data.username,
-          password: data.password,
-          full_name: data.full_name,
-          wallet_address: data.wallet_address,
-          role: data.role,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: "Registration failed" }));
-        console.error("Backend error response:", errorData);
-        throw new Error(errorData.message || "Registration failed");
-      }
-
-      await response.json();
-
-      // Show success message
-      toast.success("Registration successful! Please login with your credentials");
-
-      // Redirect to login after registration
-      setTimeout(() => navigate("/login"), 1000);
-    } catch (error) {
-      console.error("Registration error:", error);
-
-      // Check if it's a network error
-      if (error instanceof TypeError && error.message === "Failed to fetch") {
-        setApiError("Unable to connect to the server. Please check your internet connection or try using HTTP instead of HTTPS.");
-        toast.error("Connection error. Server may be unavailable.");
-      } else {
-        setApiError(error instanceof Error ? error.message : "Failed to register. Please try again.");
-        toast.error(error instanceof Error ? error.message : "Failed to register. Please try again.");
-      }
+      const walletData = await connectFreighterWallet();
+      setFormData({ ...formData, walletAddress: walletData.publicKey });
+    } catch {
+      setError("Failed to connect wallet.");
     } finally {
-      setIsLoading(false);
+      setIsConnecting(false);
     }
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+ const handleRegister = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError(null);
+
+  if (!selectedRole) return setError("Select a role before registering.");
+  if ((selectedRole === "student" || selectedRole === "donor") && !formData.walletAddress)
+    return setError("Wallet connection is required.");
+
+  setIsSubmitting(true);
+
+  try {
+    const response = await fetch("", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...formData, role: selectedRole }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      navigate("/login");
+    } else {
+      setError(data.message || "Registration failed. Try again.");
+    }
+  } catch (error) {
+    setError("Error registering. Please check your details.");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
+
   return (
-    <AuthLayout2>
-      <div className="mb-8 flex flex-col items-center">
-        <h1 className="text-2xl md:text-3xl font-bold text-center text-gray-900 dark:text-white mb-2">
-          Create your account
-        </h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
-          Join DSFS to access student funding opportunities
-        </p>
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-2xl font-bold text-center text-indigo-600">Create Account</h2>
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="username"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Username</FormLabel>
-                <FormControl>
-                  <Input disabled={isLoading} placeholder="john_doe" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input placeholder="you@example.com" type="email" disabled={isLoading} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="full_name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Full Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="John Doe" disabled={isLoading} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="wallet_address"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Wallet Address</FormLabel>
-                <FormControl>
-                  <Input placeholder="0x123456789abcdef" disabled={isLoading} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="role"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Role</FormLabel>
-                <FormControl>
-                  <select
-                    {...field}
-                    disabled={isLoading}
-                    className="w-full border border-gray-300 rounded-md p-2 dark:bg-gray-800 dark:text-white"
-                  >
-                    <option value="student">Student</option>
-                    <option value="donor">Donor</option>
-                    <option value="admin">Admin</option>
-                  </select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input placeholder="Create a password" type="password" disabled={isLoading} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="confirmPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Confirm Password</FormLabel>
-                <FormControl>
-                  <Input placeholder="Confirm your password" type="password" disabled={isLoading} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="terms"
-            render={({ field }) => (
-              <FormItem className="flex items-start space-x-3">
-                <FormControl>
-                  <Checkbox checked={field.value} onCheckedChange={field.onChange} disabled={isLoading} />
-                </FormControl>
-                <div>
-                  <FormLabel>
-                    I agree to the{" "}
-                    <Link to="/terms" className="text-blue-600 dark:text-blue-400 hover:underline">
-                      Terms of Service
-                    </Link>{" "}
-                    and{" "}
-                    <Link to="/privacy" className="text-blue-600 dark:text-blue-400 hover:underline">
-                      Privacy Policy
-                    </Link>
-                  </FormLabel>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Creating account..." : "Create account"}
-          </Button>
+        {/* Role Selection */}
+        <div className="mt-4 flex space-x-2">
+          {["student", "donor", "admin"].map((role) => (
+            <button key={role} onClick={() => handleRoleSelection(role)} className={`flex-1 py-2 rounded-md ${selectedRole === role ? "bg-indigo-600 text-white" : "bg-gray-200"}`}>
+              {role.charAt(0).toUpperCase() + role.slice(1)}
+            </button>
+          ))}
+        </div>
+
+        {error && <p className="mt-3 p-2 text-red-600 bg-red-100 text-center rounded">{error}</p>}
+
+        {/* Wallet Connection for Students & Donors */}
+        {selectedRole && selectedRole !== "admin" && (
+          <button onClick={handleWalletConnect} className="mt-4 w-full py-2 bg-indigo-600 text-white rounded-md">
+            {isConnecting ? "Connecting..." : "Connect Stellar Wallet"}
+          </button>
+        )}
+
+        {/* Registration Form */}
+        <form onSubmit={handleRegister} className="mt-4 space-y-3">
+          <label className="block">Full Name</label>
+          <input type="text" name="name" className="w-full p-2 border rounded-md" required onChange={handleChange} />
+
+          <label className="block">Email</label>
+          <input type="email" name="email" className="w-full p-2 border rounded-md" required onChange={handleChange} />
+
+          {selectedRole !== "admin" && (
+            <>
+              
+              {selectedRole === "student" && (
+                <>
+                  <label className="block">Institution</label>
+                  <input type="text" name="institution" className="w-full p-2 border rounded-md" required onChange={handleChange} />
+
+                  <label className="block">Year of Study</label>
+                  <input type="text" name="yearOfStudy" className="w-full p-2 border rounded-md" required onChange={handleChange} />
+
+                  <label className="block">Course of Study</label>
+                  <input type="text" name="course" className="w-full p-2 border rounded-md" required onChange={handleChange} />
+
+                  <label className="block">Country</label>
+                  <input type="text" name="country" className="w-full p-2 border rounded-md" required onChange={handleChange} />
+
+                  <label className="block">Bio</label>
+                  <textarea name="bio" className="w-full p-2 border rounded-md" required onChange={handleChange} />
+                </>
+              )}
+            </>
+          )}
+
+          {selectedRole === "admin" && (
+            <>
+              <label className="block">Password</label>
+              <input type="password" name="password" className="w-full p-2 border rounded-md" required onChange={handleChange} />
+            </>
+          )}
+
+          <button type="submit" className="mt-3 w-full py-2 bg-indigo-600 text-white rounded-md">Register</button>
         </form>
-      </Form>
 
-      <div className="mt-6 text-center">
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          Already have an account?{" "}
-          <Link to="/login" className="font-medium text-blue-600 dark:text-blue-400 hover:underline">
-            Sign in
-          </Link>
-        </p>
+        <p className="mt-3 text-center">Already have an account? <a href="/login" className="text-indigo-600">Login</a></p>
       </div>
-    </AuthLayout2>
+    </div>
   );
 };
 
+
+
 export default Register;
 
-function setApiError(arg0: string | null) {
-  console.error(arg0); // Log the error for debugging
-}
 
