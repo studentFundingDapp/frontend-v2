@@ -1,16 +1,17 @@
 import { motion } from "framer-motion";
-import { Bookmark, Eye, Heart, Share2 } from "lucide-react";
+import { Bookmark, Eye, Heart, Share2,DollarSign } from "lucide-react";
 import { useState } from "react";
 import { cn } from "../lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
+import { useNavigate } from "react-router-dom";
+import * as Tooltip from "@radix-ui/react-tooltip";
 
 interface Comment {
   user: string;
   text: string;
 }
-
 interface StudentDetails {
   name: string;
   degree?: string;
@@ -18,7 +19,7 @@ interface StudentDetails {
   avatarUrl?: string;
 }
 
-interface ProjectCardProps {
+export interface ProjectCardProps {
   projectName: string;
   description: string;
   imageUrl?: string;
@@ -30,7 +31,10 @@ interface ProjectCardProps {
   student?: StudentDetails;
   buttonText?: string;
   onClick?: () => void;
+  fundingCurrent: number;
+  fundingTarget: number;
 }
+
 
 const ProjectCard: React.FC<ProjectCardProps> = ({
   projectName,
@@ -42,6 +46,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   likesCount = 0,
   student,
   onClick,
+  fundingCurrent,
+  fundingTarget,
 }) => {
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -86,6 +92,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
     if (lowerTag === "social") return "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300";
     return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
   };
+
+  const navigate = useNavigate();
+  const progress = fundingTarget > 0 ? Math.min((fundingCurrent / fundingTarget) * 100, 100) : 0;
 
   return (
     <motion.div
@@ -165,6 +174,35 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
             </div>
           )}
           
+          {/* Funding Progress Bar */}
+          <Tooltip.Provider>
+  <Tooltip.Root>
+    <Tooltip.Trigger asChild>
+      <div className="relative w-full cursor-pointer group">
+        <div className="w-full h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-blue-500 rounded-full transition-all duration-300"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      </div>
+    </Tooltip.Trigger>
+    <Tooltip.Portal>
+      <Tooltip.Content
+        side="top"
+        align="center"
+        className="px-2 py-1 bg-gray-900 text-white text-xs rounded shadow-lg z-50"
+        sideOffset={6}
+      >
+        {fundingCurrent && fundingTarget
+          ? `${fundingCurrent} / ${fundingTarget} XLM`
+          : "No funding data"}
+        <Tooltip.Arrow className="fill-gray-900" />
+      </Tooltip.Content>
+    </Tooltip.Portal>
+  </Tooltip.Root>
+</Tooltip.Provider>
+
           {/* Action Buttons */}
           <div className="mt-auto flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-3">
             <div className="flex space-x-3">
@@ -187,6 +225,18 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                 <Share2 className="h-4 w-4 mr-1" />
                 Share
               </button>
+
+              <button 
+  className="flex items-center text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 text-sm"
+  onClick={(e) => {
+    e.stopPropagation();
+    navigate("/donate"); // replace with the actual donate route if different
+  }}
+>
+  <DollarSign className="h-4 w-4 mr-1" />
+  Fund
+</button>
+
             </div>
             
             <button 
