@@ -6,8 +6,8 @@ import EmptyStateBlock from "../components/donations/EmptyStateBlock";
 import EngagementFooter from "../components/donations/EngagementFooter";
 import FundingProgressChart from "../components/donations/FundingProgressChart";
 import FundingSummaryCard from "../components/donations/FundingSummaryCard";
-import { useLoading } from "../context/LoadingContext";
 import { useToast } from "../hooks/use-toast";
+import { useLoader } from "../context/LoaderContext";
 
 // Mock data for demonstration
 const mockDonationData = {
@@ -77,26 +77,24 @@ export interface DonorData {
 }
 
 const DonationsPage = () => {
-  const { loading, setLoading } = useLoading();
-  const [ready, setReady] = useState(false);
+  const { showLoader, hideLoader } = useLoader();
   const [hasDonations, setHasDonations] = useState<boolean>(true);
   const [donationData] = useState(mockDonationData);
   useToast();
 
   // Simulate checking for donations
   useEffect(() => {
+    showLoader("Loading Donations...");
+    const timer = setTimeout(() => {
+      hideLoader();
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [showLoader, hideLoader]);
+
+  useEffect(() => {
     // In a real app, this would come from an API
     setHasDonations(donationData.donors.length > 0);
   }, [donationData.donors.length]);
-
-  useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => {
-      setLoading(false);
-      setReady(true);
-    }, 1000); // Simulate 1s loading
-    return () => clearTimeout(timer);
-  }, [setLoading]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -116,10 +114,6 @@ const DonationsPage = () => {
       transition: { duration: 0.5 },
     },
   };
-
-  if (loading || !ready) {
-    return null; // Let your global loading overlay handle the spinner
-  }
 
   return (
     <PageWrapper>

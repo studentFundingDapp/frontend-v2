@@ -3,27 +3,9 @@ import { Link } from "react-router-dom";
 import { Button } from "../components/ui/button";
 // import MainLayout from "../components/layout/MainLayout";
 import { ArrowRight, Code, Globe, Lightbulb, Linkedin, Lock, MessageCircle, Star, Twitter, Users } from "lucide-react";
-import { useEffect, useState } from "react";
 import PageWrapper from "../components/PageWrapper";
-import { useLoading } from "../context/LoadingContext";
 
 const About = () => {
-  const { loading, setLoading } = useLoading();
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    setLoading(true);
-    // Simulate loading for 1 second (or fetch real data here)
-    const timer = setTimeout(() => {
-      setLoading(false);
-      setReady(true);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [setLoading]);
-
-  // Don't render the page content until loading is done
-  if (loading || !ready) return null;
-
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
     visible: {

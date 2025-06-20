@@ -4,28 +4,25 @@ import DashboardAnalytics from "../components/DashboardAnalytics";
 import PageWrapper from "../components/PageWrapper";
 import TransactionCard from "../components/TransactionCard";
 import { Button } from "../components/ui/button";
-import { useLoading } from "../context/LoadingContext";
 import { useToast } from "../hooks/use-toast";
 import { getAccountBalance } from '../utils/stellar';
 import { useAuth } from "../context/AuthContext";
+import { useLoader } from "../context/LoaderContext";
 
 export default function Index() {
-  const { loading, setLoading } = useLoading(); // Use loading context
   const { toast } = useToast();
   const { user } = useAuth();
-
-  // Show loading spinner before the page opens (simulate fetch)
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => {
-      setLoading(false);
-      setReady(true);
-    }, 1000); // Simulate is loading
-    return () => clearTimeout(timer);
-  }, [setLoading]);
+  const { showLoader, hideLoader } = useLoader();
 
   const [balance, setBalance] = useState<string>('0');
+
+  useEffect(() => {
+    showLoader("Loading Dashboard...");
+    const timer = setTimeout(() => {
+      hideLoader();
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [showLoader, hideLoader]);
 
   useEffect(() => {
     if (user?.publicKey) {
@@ -34,18 +31,6 @@ export default function Index() {
   }, [user?.publicKey]);
 
   const [showBanner, setShowBanner] = useState(true);
-
-  if (loading || !ready) {
-    return null;
-  }
-
-  const showNotification = (action: string) => {
-    toast({
-      title: `${action} clicked!`,
-      description: "This feature will be available soon.",
-      duration: 3000,
-    });
-  };
 
   // Mock transaction data
   const recentTransactions = [

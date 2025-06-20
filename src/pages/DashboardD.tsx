@@ -1,31 +1,13 @@
 import { useEffect, useState } from "react";
 import PageWrapper from "../components/PageWrapper";
 import { Button } from "../components/ui/button";
-import { useLoading } from "../context/LoadingContext";
 import CountUp from "react-countup";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 export default function DashboardD() {
-  const { loading, setLoading } = useLoading();
-  const [ready, setReady] = useState(false);
   const [showBanner, setShowBanner] = useState(true);
   const [showAllProjects, setShowAllProjects] = useState(false);
   const [showAllStudents, setShowAllStudents] = useState(false);
-
-  useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => {
-      setLoading(false);
-      setReady(true);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [setLoading]);
-
-  if (loading || !ready) {
-    return (
-      <div className="text-center p-10 text-gray-500">Loading Dashboard D...</div>
-    );
-  }
 
   const projects = [
     { name: "Decentralized Student Funding", funded: "100XLM", required: "200XLM", status: "In Progress" },
