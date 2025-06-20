@@ -7,6 +7,7 @@ const Register: React.FC = () => {
 
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
@@ -17,6 +18,7 @@ const Register: React.FC = () => {
     country: "",
     bio: "",
     password: "",
+    walletAddress: ""
   });
 
   const handleRoleSelection = (role: string) => setSelectedRole(role);

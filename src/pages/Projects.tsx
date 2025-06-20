@@ -294,6 +294,8 @@ const ProjectsPage = () => {
                     }}
                     buttonText="View Details"
                     onClick={() => handleOpenProjectDetails(project)}
+                    fundingCurrent={project.currentFunding}
+                    fundingTarget={project.fundingGoal}
                   />
                   <Button
                     variant="destructive"
@@ -353,6 +355,8 @@ const ProjectsPage = () => {
                     }}
                     buttonText="View Details"
                     onClick={() => handleOpenProjectDetails(project)}
+                    fundingCurrent={project.currentFunding}
+                    fundingTarget={project.fundingGoal}
                   />
                 </motion.div>
               ))}
