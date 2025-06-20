@@ -1,15 +1,5 @@
 // Simple Freighter wallet utilities for MVP
 
-declare global {
-  interface Window {
-    freighter?: {
-      requestAccess: () => Promise<string>;
-      getNetwork: () => Promise<string>;
-      signTransaction?: (xdr: string, network: string) => Promise<string>;
-    };
-  }
-}
-
 export const checkFreighterAvailability = async (): Promise<boolean> => {
   return !!window.freighter;
 };
@@ -20,9 +10,14 @@ export const connectFreighterWallet = async () => {
   }
 
   try {
+    if (typeof window.freighter.requestAccess !== 'function') {
+      throw new Error('Freighter requestAccess not available');
+    }
+    if (typeof window.freighter.getNetwork !== 'function') {
+      throw new Error('Freighter getNetwork not available');
+    }
     const publicKey = await window.freighter.requestAccess();
     const network = await window.freighter.getNetwork();
-    
     return { publicKey, network };
   } catch (error: any) {
     throw new Error(error.message || 'Failed to connect wallet');
