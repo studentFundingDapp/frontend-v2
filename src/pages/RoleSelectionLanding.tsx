@@ -55,7 +55,7 @@ const RoleSelectionLanding: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-indigo-100 via-blue-50 to-cyan-100 dark:from-gray-900 dark:via-indigo-950 dark:to-blue-900">
+    <div className="h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-indigo-700 via-blue-600 to-blue-400 dark:from-gray-950 dark:via-indigo-950 dark:to-blue-900">
       {/* Animated floating particles */}
       <motion.div
         className="absolute inset-0 pointer-events-none z-0"

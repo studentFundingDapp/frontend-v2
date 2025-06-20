@@ -58,15 +58,15 @@ const StudentLogin: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-100">
+    <div className={`h-screen flex bg-gradient-to-br from-indigo-700 via-blue-600 to-blue-400 dark:from-gray-950 dark:via-indigo-950 dark:to-blue-900 overflow-hidden`}>
       {/* Aside with carousel */}
-      <div className="hidden md:flex w-1/2 h-screen">
+      <div className="hidden md:flex w-1/2 h-full">
         <AuthAsideCarousel />
       </div>
       {/* Divider for large screens */}
-      <div className="hidden md:block w-px bg-gray-200 h-screen" />
+      <div className="hidden md:block w-px bg-indigo-200 dark:bg-indigo-900 h-full" />
       {/* Main content */}
-      <div className={`flex flex-col justify-center items-center w-full md:w-1/2 p-8 relative min-h-screen flex-1 ${shake ? 'animate-shake' : ''}`}>
+      <div className={`flex flex-col justify-center items-center w-full md:w-1/2 h-full relative flex-1 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-l border-indigo-200 dark:border-indigo-900 shadow-2xl ${shake ? 'animate-shake' : ''}`}>
         <motion.button
           initial={{ opacity: 0, x: -24 }}
           animate={{ opacity: 1, x: 0 }}
@@ -77,6 +77,14 @@ const StudentLogin: React.FC = () => {
         >
           <ArrowLeft className="h-6 w-6 text-indigo-600" />
         </motion.button>
+        <motion.div
+          initial={{ opacity: 0, y: 32 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="w-full max-w-sm rounded-xl shadow-lg p-4 md:p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 flex flex-col items-center overflow-y-auto"
+          style={{ maxHeight: '92vh' }}
+        >
+
         <AuthFormWrapper title="Student Login">
           <form onSubmit={handleSubmit} className="w-full">
             <FloatingLabelInput label="Username" name="username" type="text" required value={form.username} onChange={handleChange} />
@@ -92,12 +100,11 @@ const StudentLogin: React.FC = () => {
               {loading ? <Loader2 className="animate-spin h-5 w-5" /> : success ? <Check className="h-5 w-5 text-green-400" /> : "Login"}
             </motion.button>
           </form>
-          <div className="mt-6 text-xs text-gray-500 bg-gray-50 p-3 rounded">
-            <div className="mb-1 font-semibold text-gray-700">Mock Student Credentials:</div>
-            <div>Username: <span className="font-mono">student1</span></div>
-          </div>
-          <p className="mt-4 text-center text-sm">Don't have an account? <button className="text-indigo-600 hover:underline" onClick={() => navigate("/student-signup")}>Sign Up</button></p>
+      
         </AuthFormWrapper>
+          <p className="mt-4 text-center text-sm">Don't have an account? <button className="text-indigo-600 hover:underline" onClick={() => navigate("/student-login")}>Login</button></p>
+          <div className="mt-6 text-xs text-gray-400 dark:text-gray-500 text-center w-full">Powered by DSFS</div>
+        </motion.div>
       </div>
     </div>
   );

@@ -96,12 +96,11 @@ const DonorSignUp: React.FC = () => {
           className="w-full max-w-md rounded-2xl shadow-2xl p-8 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-indigo-200 dark:border-indigo-800 flex flex-col items-center overflow-y-auto"
           style={{ maxHeight: '90vh' }}
         >
-          <img src="/DsfsLogo.ico" alt="DSFS Logo" className="h-12 w-12 mb-2 drop-shadow-lg" />
-          <h2 className="text-2xl font-extrabold text-center text-indigo-700 dark:text-indigo-300 mb-2 tracking-tight">Donor Sign Up</h2>
+          
           <div className="w-12 h-1 bg-indigo-500 rounded-full mb-6" />
           <AuthFormWrapper title="Donor Sign Up">
             <form onSubmit={handleSubmit} className="w-full">
-              <FloatingLabelInput label="Email" name="email" type="email" required value={form.email} onChange={handleChange} />
+              <FloatingLabelInput label="Username/Email" name="email" type="email" required value={form.email} onChange={handleChange} />
               <FloatingLabelInput label="Phone Number" name="phone" type="tel" required value={form.phone} onChange={handleChange} />
               <FloatingLabelInput label="Password" name="password" type="password" required value={form.password} onChange={handleChange} />
               {/* Stellar Wallet Section */}
