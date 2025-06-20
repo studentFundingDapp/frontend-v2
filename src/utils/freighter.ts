@@ -5,6 +5,7 @@ declare global {
     freighter?: {
       requestAccess: () => Promise<string>;
       getNetwork: () => Promise<string>;
+      signTransaction?: (xdr: string, network: string) => Promise<string>;
     };
   }
 }
