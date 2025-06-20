@@ -11,7 +11,7 @@ import { useToast } from "../hooks/use-toast";
 
 const StudentLogin: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  useAuth();
   const [form, setForm] = useState({ username: "", password: "" });
   const [error] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
