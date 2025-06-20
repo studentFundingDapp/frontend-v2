@@ -51,8 +51,6 @@ function AppContent() {
   const isDonorPage = donorRoutes.includes(location.pathname);
   const isAuthPage = authPages.includes(location.pathname);
 
-  const { isAuthenticated } = useAuth();
-
   const isNotFound = ["/404", "/not-found", "*", "/404.html"].includes(location.pathname);
 
   return (

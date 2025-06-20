@@ -1,7 +1,6 @@
-
 // components/WalletConnection.tsx
 import React, { useState, useEffect } from 'react';
-import { connectFreighter, isFreighterAvailable } from '../utils/freighter';
+import { connectFreighterWallet, checkFreighterAvailability } from '../utils/freighter';
 
 interface WalletConnectionProps {
   onConnect: (publicKey: string) => void;
@@ -10,18 +9,24 @@ interface WalletConnectionProps {
 const WalletConnection: React.FC<WalletConnectionProps> = ({ onConnect }) => {
   const [publicKey, setPublicKey] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [freighterAvailable, setFreighterAvailable] = useState(false);
+
+  useEffect(() => {
+    checkFreighterAvailability().then(setFreighterAvailable);
+  }, []);
 
   const handleConnect = async () => {
     setIsConnecting(true);
-    const key = await connectFreighter();
-    if (key) {
-      setPublicKey(key);
-      onConnect(key);
+    try {
+      const { publicKey } = await connectFreighterWallet();
+      setPublicKey(publicKey);
+      onConnect(publicKey);
+    } finally {
+      setIsConnecting(false);
     }
-    setIsConnecting(false);
   };
 
-  if (!isFreighterAvailable()) {
+  if (!freighterAvailable) {
     return (
       <div className="wallet-error">
         <p>Freighter wallet not found!</p>

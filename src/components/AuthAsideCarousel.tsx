@@ -4,22 +4,22 @@ const slides = [
   {
     title: "Welcome to DSFS!",
     message: "Empowering students and donors through decentralized funding.",
-    img: "/auth_welcome.jpg"
+    img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80" // campus/education
   },
   {
     title: "For Students",
     message: "Create your profile, connect your Stellar wallet, and unlock new opportunities.",
-    img: "/auth_students.jpg"
+    img: "https://images.unsplash.com/photo-1513258496099-48168024aec0?auto=format&fit=crop&w=800&q=80" // students
   },
   {
     title: "For Donors",
     message: "Support students directly and transparently with blockchain technology.",
-    img: "/auth_donors.jpg"
+    img: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=800&q=80" // giving/donors
   },
   {
     title: "Secure & Transparent",
     message: "All transactions are secured on the Stellar blockchain.",
-    img: "/auth_secure.jpg"
+    img: "https://images.unsplash.com/photo-1465101178521-c1a9136a3b99?auto=format&fit=crop&w=800&q=80" // security/tech
   }
 ];
 
