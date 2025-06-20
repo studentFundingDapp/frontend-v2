@@ -7,7 +7,6 @@ const Register: React.FC = () => {
 
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
@@ -47,8 +46,6 @@ const Register: React.FC = () => {
   if ((selectedRole === "student" || selectedRole === "donor") && !formData.walletAddress)
     return setError("Wallet connection is required.");
 
-  setIsSubmitting(true);
-
   try {
     const response = await fetch("", {
       method: "POST",
@@ -65,8 +62,6 @@ const Register: React.FC = () => {
     }
   } catch (error) {
     setError("Error registering. Please check your details.");
-  } finally {
-    setIsSubmitting(false);
   }
 };
 
@@ -89,9 +84,16 @@ const Register: React.FC = () => {
 
         {/* Wallet Connection for Students & Donors */}
         {selectedRole && selectedRole !== "admin" && (
-          <button onClick={handleWalletConnect} className="mt-4 w-full py-2 bg-indigo-600 text-white rounded-md">
-            {isConnecting ? "Connecting..." : "Connect Stellar Wallet"}
-          </button>
+          <>
+            <button onClick={handleWalletConnect} className="mt-4 w-full py-2 bg-indigo-600 text-white rounded-md">
+              {isConnecting ? "Connecting..." : "Connect Stellar Wallet"}
+            </button>
+            {formData.walletAddress && (
+              <div className="mt-2 text-xs text-green-700 bg-green-100 rounded p-2 break-all">
+                Wallet Connected: {formData.walletAddress}
+              </div>
+            )}
+          </>
         )}
 
         {/* Registration Form */}
@@ -133,7 +135,9 @@ const Register: React.FC = () => {
             </>
           )}
 
-          <button type="submit" className="mt-3 w-full py-2 bg-indigo-600 text-white rounded-md">Register</button>
+          <button type="submit" className="mt-3 w-full py-2 bg-indigo-600 text-white rounded-md">
+            Register
+          </button>
         </form>
 
         <p className="mt-3 text-center">Already have an account? <a href="/login" className="text-indigo-600">Login</a></p>

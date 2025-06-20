@@ -41,7 +41,6 @@ export const submitPaymentWithFreighter = async (params: PaymentParams) => {
   try {
     // Create transaction XDR
     const transactionXDR = await createPaymentTransaction(params);
-    
     // Sign with Freighter
     if (!window.freighter || typeof window.freighter.signTransaction !== 'function') {
       throw new Error('Freighter wallet not available or signTransaction not supported');
@@ -50,13 +49,13 @@ export const submitPaymentWithFreighter = async (params: PaymentParams) => {
       transactionXDR,
       networkPassphrase
     );
-    
     // Mock submit to network for MVP
     const result = { hash: 'mockHash', result: 'mockResult' };
     return {
       success: true,
       hash: result.hash,
       result: result,
+      signedTransaction,
     };
   } catch (error) {
     console.error('Payment failed:', error);

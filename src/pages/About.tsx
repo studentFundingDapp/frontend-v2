@@ -324,7 +324,7 @@ const About = () => {
               className="bg-white text-blue-700 hover:bg-blue-50"
               asChild
             >
-              <Link to="/register">Join DSFS</Link>
+              <Link to="/role-selection">Join DSFS</Link>
             </Button>
             <Button 
               size="lg" 

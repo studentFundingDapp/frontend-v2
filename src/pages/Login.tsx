@@ -147,7 +147,7 @@ const Login: React.FC = () => {
           </>
         )}
         {/* Redirect to Registration (only show if not admin form) */}
-        {(!selectedRole || selectedRole !== "admin") && (
+        {/* {(!selectedRole || selectedRole !== "admin") && (
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">New to the platform?</p>
             <button
@@ -157,7 +157,7 @@ const Login: React.FC = () => {
               Create Student Profile
             </button>
           </div>
-        )}
+        )} */}
         {/* Display User Info When Connected */}
         {user && (
           <div className="mt-6 p-3 bg-green-50 border border-green-200 rounded-md text-center">
