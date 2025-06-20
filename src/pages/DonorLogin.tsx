@@ -8,13 +8,10 @@ import FloatingLabelInput from "../components/ui/floating-label-input";
 import { Check, Loader2, XCircle, CheckCircle } from "lucide-react";
 import { useToast } from "../hooks/use-toast";
 
-const MOCK_IDENTIFIER = "donor1";
-const MOCK_PASSWORD = "donorpass";
-
 const DonorLogin: React.FC = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({ identifier: "", password: "" });
-  const [error, setError] = useState<string | null>(null);
+  const [error] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [shake, setShake] = useState(false);
@@ -98,7 +95,10 @@ const DonorLogin: React.FC = () => {
               {loading ? <Loader2 className="animate-spin h-5 w-5" /> : success ? <Check className="h-5 w-5 text-green-400" /> : "Login"}
             </motion.button>
           </form>
-          
+          <div className="mt-6 text-xs text-gray-500 bg-gray-50 p-3 rounded">
+            <div className="mb-1 font-semibold text-gray-700">Mock Donor Credentials:</div>
+            <div>Email/Phone: <span className="font-mono">donor1</span></div>
+          </div>
           <p className="mt-4 text-center text-sm">Don't have an account? <button className="text-blue-600 hover:underline" onClick={() => navigate("/donor-signup")}>Sign Up</button></p>
         </AuthFormWrapper>
           <div className="mt-8 text-xs text-gray-400 dark:text-gray-500 text-center w-full">Powered by DSFS</div>

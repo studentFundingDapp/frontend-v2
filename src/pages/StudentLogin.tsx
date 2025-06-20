@@ -9,14 +9,11 @@ import FloatingLabelInput from "../components/ui/floating-label-input";
 import { Check, Loader2, XCircle, CheckCircle } from "lucide-react";
 import { useToast } from "../hooks/use-toast";
 
-const MOCK_USERNAME = "student1";
-const MOCK_PASSWORD = "newpass456";
-
 const StudentLogin: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [form, setForm] = useState({ username: "", password: "" });
-  const [error, setError] = useState<string | null>(null);
+  const [error] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const { toast } = useToast();

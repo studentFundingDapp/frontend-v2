@@ -5,7 +5,7 @@ import { useToast } from "../hooks/use-toast";
 import FloatingLabelInput from "../components/ui/floating-label-input";
 import AuthFormWrapper from "../components/AuthFormWrapper";
 import { motion } from "framer-motion";
-import { Check, Loader2, XCircle, CheckCircle, ArrowLeft } from "lucide-react";
+import { XCircle, CheckCircle, ArrowLeft } from "lucide-react";
 
 const generateStellarKeypair = () => {
   // Placeholder: Replace with real keypair generation logic
@@ -29,8 +29,6 @@ const StudentSignUp: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showWallet, setShowWallet] = useState(false);
   const [generated, setGenerated] = useState<{publicKey: string, secret: string} | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
   const { toast } = useToast();
   const [shake, setShake] = useState(false);
 
@@ -56,13 +54,10 @@ const StudentSignUp: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setSuccess(false);
     if (!form.email || !form.phone || !form.username || !form.password || !form.walletAddress) {
       setShake(true);
       setTimeout(() => setShake(false), 600);
       setTimeout(() => {
-        setLoading(false);
         toast({
           title: "Sign up failed!",
           description: "Please fill in all required fields.",
@@ -73,15 +68,12 @@ const StudentSignUp: React.FC = () => {
       return;
     }
     setTimeout(() => {
-      setLoading(false);
-      setSuccess(true);
       toast({
         title: "Sign up successful!",
         description: "Welcome to DSFS.",
         variant: "default",
         icon: <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', bounce: 0.6 }}><CheckCircle className="text-green-500" /></motion.span>
       });
-      setTimeout(() => setSuccess(false), 2000);
     }, 1500);
   };
 

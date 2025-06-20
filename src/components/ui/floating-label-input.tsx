@@ -13,7 +13,7 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({ label, error, c
 
   return (
     <div className={`relative w-full mb-3 ${className}`}>
-      <motion.input
+      <input
         {...props}
         ref={inputRef}
         className={`peer w-full px-3 pt-5 pb-1 h-10 bg-white dark:bg-gray-900 border-2 border-gray-200 rounded-lg outline-none transition-all duration-200 text-sm text-gray-900 dark:text-white placeholder-transparent focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 ${error ? "border-red-400" : ""}`}
