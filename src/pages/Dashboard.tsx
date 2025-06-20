@@ -7,9 +7,12 @@ import { Button } from "../components/ui/button";
 import { useLoading } from "../context/LoadingContext";
 import { useToast } from "../hooks/use-toast";
 import { getAccountBalance } from '../utils/stellar';
+import { useAuth } from "../context/AuthContext";
+
 export default function Index() {
   const { loading, setLoading } = useLoading(); // Use loading context
   const { toast } = useToast();
+  const { user } = useAuth();
 
   // Show loading spinner before the page opens (simulate fetch)
   const [ready, setReady] = useState(false);
@@ -25,10 +28,10 @@ export default function Index() {
   const [balance, setBalance] = useState<string>('0');
 
   useEffect(() => {
-    if (publicKey) {
-      getAccountBalance(publicKey).then(setBalance);
+    if (user?.publicKey) {
+      getAccountBalance(user.publicKey).then(setBalance);
     }
-  }, [publicKey]);
+  }, [user?.publicKey]);
 
   const [showBanner, setShowBanner] = useState(true);
 
@@ -98,7 +101,7 @@ export default function Index() {
     <PageWrapper>
       <div>
       <header>
-     <p>Wallet: {publicKey?.slice(0, 8)}...{publicKey?.slice(-8)}</p>
+     <p>Wallet: {user?.publicKey ? `${user.publicKey.slice(0, 8)}...${user.publicKey.slice(-8)}` : 'N/A'}</p>
           <p>Balance: {balance} XLM</p>
           </header>
           </div>
