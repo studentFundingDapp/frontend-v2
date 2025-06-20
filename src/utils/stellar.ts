@@ -2,8 +2,12 @@ export const networkPassphrase = "Test SDF Network ; September 2015";
 
 // Mock functions for MVP testing
 export const getAccountInfo = async (publicKey: string) => {
-  console.log('Mock: Getting account info for', publicKey);
-  return { id: publicKey, balances: [] };
+  // Mock a minimal Account object for TransactionBuilder
+  return {
+    accountId: () => publicKey,
+    sequenceNumber: () => "0",
+    incrementSequenceNumber: () => {},
+  } as any;
 };
 
 export const getAccountBalance = async (publicKey: string): Promise<string> => {
