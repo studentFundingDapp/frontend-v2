@@ -22,6 +22,7 @@ export default function Index() {
     return () => clearTimeout(timer);
   }, [setLoading]);
 
+  const [publicKey, setPublicKey] = useState<string | null>(null);
   const [balance, setBalance] = useState<string>('0');
 
   useEffect(() => {

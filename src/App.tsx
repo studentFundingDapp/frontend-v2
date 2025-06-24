@@ -13,7 +13,6 @@ import Projects from "./pages/Projects";
 import Donations from "./pages/Donations";
 import Profile from "./pages/Profile";
 
-import Projects from "./pages/Projects";
 import DashboardD from "./pages/DashboardD";
 import DonorNavBar from "./components/DonorNavBar";
 import Donate from "./pages/Donate";
@@ -86,18 +85,15 @@ function AppContent() {
             {/* </> */}
           {/* ) : ( */}
             <>
-<<<<<<< HEAD
               {/* If not authenticated, redirect protected paths to login */}
               {/* <Route path="/dashboard" element={<Navigate to="/login" replace />} />
-=======
               {/* Redirect unauthenticated users to login */}
               <Route path="/dashboard" element={<Navigate to="/login" replace />} />
->>>>>>> f4f240b02160226445d275657ff22fa51efc7984
               <Route path="/projects" element={<Navigate to="/login" replace />} />
               <Route path="/about" element={<Navigate to="/login" replace />} />
               <Route path="/profile" element={<Navigate to="/login" replace />} />
               <Route path="/donations" element={<Navigate to="/login" replace />} /> 
-            </> */}
+            </> 
           {/* )} */}
 
           {/* Catch-all route */}
