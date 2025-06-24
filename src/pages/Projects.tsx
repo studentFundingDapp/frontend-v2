@@ -7,7 +7,7 @@ import NewProjectModal from "../components/NewProjectModal";
 import ProjectCard from "../components/ProjectCard";
 import ProjectDetailsModal from "../components/ProjectDetailsModal";
 import { Button } from "../components/ui/button";
-import { useLoading } from "../context/LoadingContext";
+import { useLoader } from "../context/LoaderContext";
 
 // Types for project data based on API specs
 export interface Project {
@@ -50,7 +50,7 @@ const containerVariants = {
 
 const ProjectsPage = () => {
   const navigate = useNavigate();
-  const { loading, setLoading } = useLoading(); // Use loading context
+  const { showLoader, hideLoader } = useLoader();
   const [allProjects, setAllProjects] = useState<Project[]>([]);
   const [myProjects, setMyProjects] = useState<Project[]>([]);
   const [publicProjects, setPublicProjects] = useState<Project[]>([]);
@@ -62,17 +62,6 @@ const ProjectsPage = () => {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("recent");
   const [search, setSearch] = useState<string>("");
-  const [ready, setReady] = useState(false);
-
-  // Initial loading before page opens (like About page)
-  useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => {
-      setLoading(false);
-      setReady(true);
-    }, 1000); // Simulate 1s loading
-    return () => clearTimeout(timer);
-  }, [setLoading]);
 
   // Check if user is logged in
   useEffect(() => {
@@ -91,9 +80,8 @@ const ProjectsPage = () => {
 
   // Fetch all projects
   useEffect(() => {
-    if (!ready) return;
+    showLoader("Loading Projects...");
     const fetchProjects = async () => {
-      setLoading(true);
       try {
         const token = localStorage.getItem('token');
         const response = await fetch("http://studybae.online:8000/api/projects", {
@@ -103,15 +91,14 @@ const ProjectsPage = () => {
         if (!response.ok) throw new Error("Failed to fetch projects");
         const data = await response.json();
         setAllProjects(data);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         setAllProjects([]);
       } finally {
-        setLoading(false);
+        hideLoader();
       }
     };
     fetchProjects();
-  }, [setLoading, ready]);
+  }, [hideLoader, showLoader]);
 
   // Split projects into "My Projects" and "Public Projects"
   useEffect(() => {
@@ -190,9 +177,6 @@ const ProjectsPage = () => {
     setSelectedProject(project);
     setIsDetailsModalOpen(true);
   };
-
-  // Show loading spinner before the page opens
-  if (loading || !ready) return null;
 
   return (
     <div className="container mx-auto px-4 py-6 sm:py-8 min-h-screen bg-white dark:bg-gray-900">
@@ -294,6 +278,8 @@ const ProjectsPage = () => {
                     }}
                     buttonText="View Details"
                     onClick={() => handleOpenProjectDetails(project)}
+                    fundingCurrent={project.currentFunding}
+                    fundingTarget={project.fundingGoal}
                   />
                   <Button
                     variant="destructive"
@@ -353,6 +339,8 @@ const ProjectsPage = () => {
                     }}
                     buttonText="View Details"
                     onClick={() => handleOpenProjectDetails(project)}
+                    fundingCurrent={project.currentFunding}
+                    fundingTarget={project.fundingGoal}
                   />
                 </motion.div>
               ))}

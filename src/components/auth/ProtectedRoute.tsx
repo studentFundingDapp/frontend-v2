@@ -15,7 +15,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
       <div className="auth-required">
         <h2>Connect Your Wallet</h2>
         <p>Please connect your Stellar wallet to continue</p>
-        <WalletConnection onConnect={login} />
+        <WalletConnection onConnect={(publicKey) => login(publicKey, "mockNetwork", "student")} />
       </div>
     );
   }

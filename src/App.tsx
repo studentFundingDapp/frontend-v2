@@ -1,109 +1,102 @@
+import React from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from "react-router-dom";
 import AuthFooter from "./components/AuthFooter";
 import Footer from "./components/Footer";
 import NavBar from "./components/NavBar";
 import { Toaster } from "./components/ui/sonner";
-import { LoadingProvider } from "./context/LoadingContext";
 import { ThemeProvider } from "./context/ThemeProvider";
 import { AuthProvider, useAuth } from "./context/AuthContext";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Projects from "./pages/Projects";
 import Donations from "./pages/Donations";
 import Profile from "./pages/Profile";
+
 
 import DashboardD from "./pages/DashboardD";
 import DonorNavBar from "./components/DonorNavBar";
 import Donate from "./pages/Donate";
 import ExploreStudents from "./pages/ExploreStudents";
 import DonorProfile from "./pages/DonorProfile";
-
 import About from "./pages/About";
+import StudentSignUp from "./pages/StudentSignUp";
+import StudentLogin from "./pages/StudentLogin";
+import DonorSignUp from "./pages/DonorSignUp";
+import DonorLogin from "./pages/DonorLogin";
+import RoleSelectionLanding from "./pages/RoleSelectionLanding";
+import Loader from "./components/Loader";
+import { LoaderProvider, useLoader } from "./context/LoaderContext";
 
+function PrivateRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
+}
 
 function App() {
   return (
     <AuthProvider>
       <ThemeProvider>
-        <LoadingProvider>
+        <LoaderProvider>
           <Router>
             <AppContent />
             <Toaster position="top-right" />
           </Router>
-        </LoadingProvider>
+        </LoaderProvider>
       </ThemeProvider>
  </AuthProvider>
   );
 }
 
 function AppContent() {
+  const { show, message } = useLoader();
   const location = useLocation();
 
-  const donorRoutes = ["/dashboard-d", "/donate", "/students","/about", "/profile-d"];
- const isDonorPage = donorRoutes.includes(location.pathname);
-
-  const { isAuthenticated } = useAuth();
-
-  console.log("AppContent rendering. Authenticated:", isAuthenticated); 
-
+  const authPages = ["/login", "/student-login", "/student-signup", "/donor-login", "/donor-signup"];
+  const donorRoutes = ["/dashboard-d", "/donate", "/students", "/about", "/profile-d"];
+  const isDonorPage = donorRoutes.includes(location.pathname);
+  const isAuthPage = authPages.includes(location.pathname);
 
   const isNotFound = ["/404", "/not-found", "*", "/404.html"].includes(location.pathname);
 
   return (
-    <div className="flex flex-col min-h-screen">
-      {!isNotFound &&(isDonorPage ? <DonorNavBar/> : <NavBar />)}
-      <div className="flex-grow">
-        <Routes>
+    <>
+      <Loader show={show} message={message} />
+      <div className="flex flex-col min-h-screen">
+        {!isNotFound && !isAuthPage && (isDonorPage ? <DonorNavBar /> : <NavBar />)}
+        <div className="flex-grow">
+          <Routes>
+            {/* Auth & Role Selection */}
+            <Route path="/login" element={<RoleSelectionLanding />} />
+            <Route path="/student-signup" element={<StudentSignUp />} />
+            <Route path="/student-login" element={<StudentLogin />} />
+            <Route path="/donor-signup" element={<DonorSignUp />} />
+            <Route path="/donor-login" element={<DonorLogin />} />
 
-          {/* Direct access to all main pages */}
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/projects" element={<Projects />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/donations" element={<Donations />} />
-          <Route path="/dashboard-d" element={<DashboardD />} />
-          <Route path="/donate" element={<Donate />} />
-          <Route path="/students" element={<ExploreStudents />} />
-          <Route path="/profile-d" element={<DonorProfile />} />
+            {/* Public Routes */}
+            <Route path="/about" element={<About />} />
 
-          <Route path="/login" element={<Login />} />
+            {/* Donor Routes (no auth protection, add if needed) */}
+            <Route path="/dashboard-d" element={<DashboardD />} />
+            <Route path="/donate" element={<Donate />} />
+            <Route path="/students" element={<ExploreStudents />} />
+            <Route path="/profile-d" element={<DonorProfile />} />
 
-          {/* Redirect root to login */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/register" element={<Register />} />
+            {/* Private Routes */}
+            <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+            <Route path="/projects" element={<PrivateRoute><Projects /></PrivateRoute>} />
+            <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+            <Route path="/donations" element={<PrivateRoute><Donations /></PrivateRoute>} />
 
+            {/* Redirect root to login */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
 
-          {/* Private Routes */}
-          {/* {isAuthenticated ? (
-            <> */}
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/projects" element={<Projects />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/donations" element={<Donations />} />
-            {/* </> */}
-          {/* ) : ( */}
-            <>
-              {/* If not authenticated, redirect protected paths to login */}
-              {/* <Route path="/dashboard" element={<Navigate to="/login" replace />} />
-              {/* Redirect unauthenticated users to login */}
-              <Route path="/dashboard" element={<Navigate to="/login" replace />} />
-              <Route path="/projects" element={<Navigate to="/login" replace />} />
-              <Route path="/about" element={<Navigate to="/login" replace />} />
-              <Route path="/profile" element={<Navigate to="/login" replace />} />
-              <Route path="/donations" element={<Navigate to="/login" replace />} /> 
-            </> 
-          {/* )} */}
-
-          {/* Catch-all route */}
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
+            {/* Catch-all route */}
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </Routes>
+        </div>
+        {!isNotFound && !isAuthPage && <Footer />}
+        {isNotFound && <AuthFooter />}
       </div>
-      {!isNotFound && (isDonorPage ? <DonorNavBar /> : <NavBar />)}
-      {!isNotFound && <Footer />}
-      {isNotFound && <AuthFooter />}
-    </div>
+    </>
   );
 }
 

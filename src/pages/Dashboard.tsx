@@ -4,46 +4,34 @@ import DashboardAnalytics from "../components/DashboardAnalytics";
 import PageWrapper from "../components/PageWrapper";
 import TransactionCard from "../components/TransactionCard";
 import { Button } from "../components/ui/button";
-import { useLoading } from "../context/LoadingContext";
 import { useToast } from "../hooks/use-toast";
 import { getAccountBalance } from '../utils/stellar';
-export default function Index() {
-  const { loading, setLoading } = useLoading(); // Use loading context
-  const { toast } = useToast();
+import { useAuth } from "../context/AuthContext";
+import { useLoader } from "../context/LoaderContext";
 
-  // Show loading spinner before the page opens (simulate fetch)
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => {
-      setLoading(false);
-      setReady(true);
-    }, 1000); // Simulate is loading
-    return () => clearTimeout(timer);
-  }, [setLoading]);
+export default function Index() {
+  const { toast } = useToast();
+  const { user } = useAuth();
+  const { showLoader, hideLoader } = useLoader();
 
   const [publicKey, setPublicKey] = useState<string | null>(null);
   const [balance, setBalance] = useState<string>('0');
 
   useEffect(() => {
-    if (publicKey) {
-      getAccountBalance(publicKey).then(setBalance);
+    showLoader("Loading Dashboard...");
+    const timer = setTimeout(() => {
+      hideLoader();
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [showLoader, hideLoader]);
+
+  useEffect(() => {
+    if (user?.publicKey) {
+      getAccountBalance(user.publicKey).then(setBalance);
     }
-  }, [publicKey]);
+  }, [user?.publicKey]);
 
   const [showBanner, setShowBanner] = useState(true);
-
-  if (loading || !ready) {
-    return null;
-  }
-
-  const showNotification = (action: string) => {
-    toast({
-      title: `${action} clicked!`,
-      description: "This feature will be available soon.",
-      duration: 3000,
-    });
-  };
 
   // Mock transaction data
   const recentTransactions = [
@@ -99,7 +87,7 @@ export default function Index() {
     <PageWrapper>
       <div>
       <header>
-     <p>Wallet: {publicKey?.slice(0, 8)}...{publicKey?.slice(-8)}</p>
+     <p>Wallet: {user?.publicKey ? `${user.publicKey.slice(0, 8)}...${user.publicKey.slice(-8)}` : 'N/A'}</p>
           <p>Balance: {balance} XLM</p>
           </header>
           </div>

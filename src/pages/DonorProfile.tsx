@@ -13,8 +13,8 @@ import { Button } from "../components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../components/ui/form";
 import { Input } from "../components/ui/input";
-import { useLoading } from "../context/LoadingContext";
 import { useToast } from "../hooks/use-toast";
+import { useLoader } from "../context/LoaderContext";
 
 
 // Mock data for initial development
@@ -176,11 +176,10 @@ const PLACEHOLDER_PROJECT: Project = {
 
 
 const DonorProfile = () => {
-  const { loading, setLoading } = useLoading();
-
+  const { toast } = useToast();
+  const { showLoader, hideLoader } = useLoader();
   const [user, setUser] = useState(mockUserData);
   const [isEditing, setIsEditing] = useState(false);
-  const { toast } = useToast();
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
   const [showProjectDetails, setShowProjectDetails] = useState<{ open: boolean; project: Project | null }>({ open: false, project: null });
   const [currentPage, setCurrentPage] = useState(1);
@@ -198,9 +197,17 @@ const DonorProfile = () => {
     }
   });
 
+  useEffect(() => {
+    showLoader("Loading Donor Profile...");
+    const timer = setTimeout(() => {
+      hideLoader();
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [showLoader, hideLoader]);
+
   // Handle form submission
   const onSubmit = (data: ProfileFormValues) => {
-    setLoading(true);
+    showLoader("Updating Profile...");
     setTimeout(() => {
       setUser(prev => ({
         ...prev,
@@ -209,7 +216,7 @@ const DonorProfile = () => {
         bio: data.bio || prev.bio
       }));
       setIsEditing(false);
-      setLoading(false);
+      hideLoader();
       toast({
         title: "Profile updated",
         description: "Your profile has been saved successfully.",
@@ -250,27 +257,9 @@ const DonorProfile = () => {
         throw new Error("Function not implemented.");
     }
 
-  // Show loading spinner before the page opens (simulate fetch)
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => {
-      setLoading(false);
-      setReady(true);
-    }, 1000); // Simulate 1s loading
-    return () => clearTimeout(timer);
-  }, [setLoading]);
-
-  if (loading || !ready) return null;
-
   return (
     <PageWrapper>
       <div className="container max-w-5xl mx-auto py-10 px-4">
-        {loading && (
-          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-            <Loader2 className="animate-spin h-12 w-12 text-primary" />
-          </div>
-        )}
         <motion.div
           initial="hidden"
           animate="show"

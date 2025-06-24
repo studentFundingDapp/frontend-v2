@@ -3,43 +3,32 @@ import * as Select from "@radix-ui/react-select";
 import { Button } from "../components/ui/button";
 import PageWrapper from "../components/PageWrapper";
 import { useToast } from "../hooks/use-toast";
-import { useLoading } from "../context/LoadingContext";
+import { useLoader } from "../context/LoaderContext";
 
 export default function Donate() {
   const { toast } = useToast();
+  const { showLoader, hideLoader } = useLoader();
   const [amount, setAmount] = useState("");
   const [anonymity, setAnonymity] = useState("Show Name");
-   const { loading, setLoading } = useLoading();
-  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-      setLoading(true);
-      const timer = setTimeout(() => {
-        setLoading(false);
-        setReady(true);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }, [setLoading]);
-  
-    if (loading || !ready) {
-      return (
-        <div className="text-center p-10 text-gray-500">Loading Dashboard D...</div>
-      );
-    }
+    showLoader("Loading Donate...");
+    const timer = setTimeout(() => {
+      hideLoader();
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [showLoader, hideLoader]);
 
   const handleDonate = async () => {
     if (!amount || isNaN(Number(amount))) {
       toast({ title: "Invalid Amount", description: "Please enter a valid amount." });
       return;
     }
-
+    showLoader("Processing Donation...");
     const payload = {
       amount,
       anonymous: anonymity === "Anonymous",
     };
-
-    setLoading(true);
-
     try {
       await fetch("/api/donate", {
         method: "POST",
@@ -48,12 +37,9 @@ export default function Donate() {
         },
         body: JSON.stringify(payload),
       });
-
       toast({
         title: "Donation Successful",
-        // description: `You donated ${amount} XLM${anonymity === "Anonymous" ? " anonymously" : ""} to ${donationTarget}.`,
       });
-
       setAmount("");
     } catch {
       toast({
@@ -61,7 +47,7 @@ export default function Donate() {
         description: "Something went wrong. Please try again.",
       });
     } finally {
-      setLoading(false);
+      hideLoader();
     }
   };
 
@@ -131,10 +117,9 @@ export default function Donate() {
 
         <Button
           onClick={handleDonate}
-          disabled={loading}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white"
         >
-          {loading ? "Processing..." : "Donate"}
+          Donate
         </Button>
       </div>
     </PageWrapper>

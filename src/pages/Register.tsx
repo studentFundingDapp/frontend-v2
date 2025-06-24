@@ -1,3 +1,4 @@
+{/* @ts-nocheck 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { connectFreighterWallet} from "../utils/freighter";
@@ -17,6 +18,7 @@ const Register: React.FC = () => {
     country: "",
     bio: "",
     password: "",
+    walletAddress: ""
   });
 
   const handleRoleSelection = (role: string) => setSelectedRole(role);
@@ -45,8 +47,6 @@ const Register: React.FC = () => {
   if ((selectedRole === "student" || selectedRole === "donor") && !formData.walletAddress)
     return setError("Wallet connection is required.");
 
-  setIsSubmitting(true);
-
   try {
     const response = await fetch("", {
       method: "POST",
@@ -63,8 +63,6 @@ const Register: React.FC = () => {
     }
   } catch (error) {
     setError("Error registering. Please check your details.");
-  } finally {
-    setIsSubmitting(false);
   }
 };
 
@@ -74,7 +72,7 @@ const Register: React.FC = () => {
       <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold text-center text-indigo-600">Create Account</h2>
 
-        {/* Role Selection */}
+        
         <div className="mt-4 flex space-x-2">
           {["student", "donor", "admin"].map((role) => (
             <button key={role} onClick={() => handleRoleSelection(role)} className={`flex-1 py-2 rounded-md ${selectedRole === role ? "bg-indigo-600 text-white" : "bg-gray-200"}`}>
@@ -85,14 +83,21 @@ const Register: React.FC = () => {
 
         {error && <p className="mt-3 p-2 text-red-600 bg-red-100 text-center rounded">{error}</p>}
 
-        {/* Wallet Connection for Students & Donors */}
+        {/* Wallet Connection for Students & Donors /}
         {selectedRole && selectedRole !== "admin" && (
-          <button onClick={handleWalletConnect} className="mt-4 w-full py-2 bg-indigo-600 text-white rounded-md">
-            {isConnecting ? "Connecting..." : "Connect Stellar Wallet"}
-          </button>
+          <>
+            <button onClick={handleWalletConnect} className="mt-4 w-full py-2 bg-indigo-600 text-white rounded-md">
+              {isConnecting ? "Connecting..." : "Connect Stellar Wallet"}
+            </button>
+            {formData.walletAddress && (
+              <div className="mt-2 text-xs text-green-700 bg-green-100 rounded p-2 break-all">
+                Wallet Connected: {formData.walletAddress}
+              </div>
+            )}
+          </>
         )}
 
-        {/* Registration Form */}
+        {/* Registration Form /}
         <form onSubmit={handleRegister} className="mt-4 space-y-3">
           <label className="block">Full Name</label>
           <input type="text" name="name" className="w-full p-2 border rounded-md" required onChange={handleChange} />
@@ -131,7 +136,9 @@ const Register: React.FC = () => {
             </>
           )}
 
-          <button type="submit" className="mt-3 w-full py-2 bg-indigo-600 text-white rounded-md">Register</button>
+          <button type="submit" className="mt-3 w-full py-2 bg-indigo-600 text-white rounded-md">
+            Register
+          </button>
         </form>
 
         <p className="mt-3 text-center">Already have an account? <a href="/login" className="text-indigo-600">Login</a></p>
@@ -145,3 +152,4 @@ const Register: React.FC = () => {
 export default Register;
 
 
+*/}
