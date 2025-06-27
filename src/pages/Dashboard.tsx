@@ -4,13 +4,12 @@ import DashboardAnalytics from "../components/DashboardAnalytics";
 import PageWrapper from "../components/PageWrapper";
 import TransactionCard from "../components/TransactionCard";
 import { Button } from "../components/ui/button";
-import { useToast } from "../hooks/use-toast";
 import { getAccountBalance } from '../utils/stellar';
 import { useAuth } from "../context/AuthContext";
 import { useLoader } from "../context/LoaderContext";
+import { toast } from "sonner";
 
 export default function Index() {
-  const { toast } = useToast();
   const { user } = useAuth();
   const { showLoader, hideLoader } = useLoader();
 
@@ -139,20 +138,20 @@ export default function Index() {
             <div className="flex space-x-3">
               <Button 
                 variant="outline" 
-                onClick={() => showNotification("Withdraw funds")}
+                onClick={() => toast.info("Withdraw funds functionality coming soon")}
                 className="border-orange-500 dark:border-orange-400 text-orange-500 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20"
               >
                 Withdraw
               </Button>
               <Button 
                 variant="outline" 
-                onClick={() => showNotification("Send funds")}
+                onClick={() => toast.info("Send funds functionality coming soon")}
                 className="border-blue-600 dark:border-blue-500 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
               >
                 Send
               </Button>
               <Button 
-                onClick={() => showNotification("Receive funds")}
+                onClick={() => toast.info("Receive funds functionality coming soon")}
                 className="bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-600"
               >
                 Receive
@@ -180,7 +179,7 @@ export default function Index() {
                   <Button 
                     variant="ghost" 
                     className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 p-0"
-                    onClick={() => showNotification("View all transactions")}
+                    onClick={() => toast.info("View all transactions functionality coming soon")}
                   >
                     View all
                   </Button>

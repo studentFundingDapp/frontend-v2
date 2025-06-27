@@ -15,7 +15,7 @@ const StudentLogin: React.FC = () => {
   const { login } = useAuth();
   const [form, setForm] = useState({ username: "", password: "" });
   const [error] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
   const [success, setSuccess] = useState(false);
   const { toast } = useToast();
   const [shake, setShake] = useState(false);
@@ -103,7 +103,7 @@ const StudentLogin: React.FC = () => {
             </form>
         
           </AuthFormWrapper>
-            <p className="mt-4 text-center text-sm">Don't have an account? <button className="text-indigo-600 hover:underline" onClick={() => navigate("/student-login")}>Login</button></p>
+            <p className="mt-4 text-center text-sm">Don't have an account? <button className="text-indigo-600 hover:underline" onClick={() => navigate("/student-signup")}>Sign Up</button></p>
             <div className="mt-6 text-xs text-gray-400 dark:text-gray-500 text-center w-full">Powered by DSFS</div>
           </motion.div>
         </div>

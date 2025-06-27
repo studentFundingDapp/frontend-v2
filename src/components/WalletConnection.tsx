@@ -22,7 +22,7 @@ const WalletConnection: React.FC<WalletConnectionProps> = ({ onConnect }) => {
       setPublicKey(publicKey);
       onConnect(publicKey);
     } finally {
-      setIsConnecting(false);
+    setIsConnecting(false);
     }
   };
 

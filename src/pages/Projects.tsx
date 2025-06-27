@@ -1,7 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import NewProjectModal from "../components/NewProjectModal";
 import ProjectCard from "../components/ProjectCard";
@@ -38,7 +37,165 @@ export interface Project {
   deadline: string;
 }
 
-
+// Mock data for projects
+const mockProjects: Project[] = [
+  {
+    id: "1",
+    title: "AI-Powered Learning Assistant",
+    description: "An intelligent tutoring system that adapts to individual student learning styles using machine learning algorithms.",
+    status: "approved",
+    fundingGoal: 8000,
+    currentFunding: 5200,
+    imageUrl: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=600&q=80",
+    mediaUrls: ["https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=600&q=80"],
+    category: "Technology",
+    createdAt: "2024-01-15",
+    updatedAt: "2024-01-20",
+    walletAddress: "GDZJHM7G5MWQXLRKXDGBFTM7JT2BT564CJLWCAU2FRPXGEYYRLDNWXLY",
+    studentAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
+    studentName: "Alex Chen",
+    university: "MIT",
+    tags: ["AI", "Education", "Machine Learning"],
+    githubUrl: "https://github.com/alexchen/ai-tutor",
+    linkedinUrl: "https://linkedin.com/in/alexchen",
+    twitterUrl: "https://twitter.com/alexchen",
+    objectives: "Create an AI tutor that helps students learn at their own pace",
+    deliverables: "Web application with mobile app",
+    deadline: "2024-06-30",
+    target_amount: 8000,
+    current_amount: 5200
+  },
+  {
+    id: "2",
+    title: "Sustainable Campus Energy System",
+    description: "A renewable energy solution for university campuses using solar panels and smart grid technology.",
+    status: "pending",
+    fundingGoal: 15000,
+    currentFunding: 3200,
+    imageUrl: "https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=600&q=80",
+    mediaUrls: ["https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=600&q=80"],
+    category: "Environment",
+    createdAt: "2024-02-01",
+    updatedAt: "2024-02-05",
+    walletAddress: "GABC1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+    studentAvatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?auto=format&fit=crop&w=150&q=80",
+    studentName: "Sarah Johnson",
+    university: "Stanford University",
+    tags: ["Sustainability", "Energy", "Green Tech"],
+    githubUrl: "https://github.com/sarahj/solar-campus",
+    linkedinUrl: "https://linkedin.com/in/sarahjohnson",
+    twitterUrl: "https://twitter.com/sarahj",
+    objectives: "Reduce campus carbon footprint by 40%",
+    deliverables: "Complete solar installation and monitoring system",
+    deadline: "2024-08-15",
+    target_amount: 15000,
+    current_amount: 3200
+  },
+  {
+    id: "3",
+    title: "Mental Health Support Platform",
+    description: "A digital platform connecting students with mental health professionals and peer support groups.",
+    status: "approved",
+    fundingGoal: 6000,
+    currentFunding: 6000,
+    imageUrl: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=600&q=80",
+    mediaUrls: ["https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=600&q=80"],
+    category: "Medical",
+    createdAt: "2024-01-10",
+    updatedAt: "2024-01-25",
+    walletAddress: "GDEF9876543210ZYXWVUTSRQPONMLKJIHGFEDCBA",
+    studentAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=150&q=80",
+    studentName: "Maria Rodriguez",
+    university: "UCLA",
+    tags: ["Mental Health", "Wellness", "Support"],
+    githubUrl: "https://github.com/mariar/mental-health-app",
+    linkedinUrl: "https://linkedin.com/in/mariarodriguez",
+    twitterUrl: "https://twitter.com/mariar",
+    objectives: "Provide accessible mental health support for students",
+    deliverables: "Mobile app with web dashboard",
+    deadline: "2024-05-20",
+    target_amount: 6000,
+    current_amount: 6000
+  },
+  {
+    id: "4",
+    title: "Blockchain-Based Academic Credentials",
+    description: "A decentralized system for issuing and verifying academic credentials using blockchain technology.",
+    status: "completed",
+    fundingGoal: 12000,
+    currentFunding: 12000,
+    imageUrl: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=600&q=80",
+    mediaUrls: ["https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=600&q=80"],
+    category: "Technology",
+    createdAt: "2023-11-15",
+    updatedAt: "2024-01-30",
+    walletAddress: "GGHI111122223333444455556666777788889999",
+    studentAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80",
+    studentName: "David Kim",
+    university: "UC Berkeley",
+    tags: ["Blockchain", "Education", "Credentials"],
+    githubUrl: "https://github.com/davidk/blockchain-credentials",
+    linkedinUrl: "https://linkedin.com/in/davidkim",
+    twitterUrl: "https://twitter.com/davidk",
+    objectives: "Create tamper-proof academic credential system",
+    deliverables: "Blockchain platform and verification tools",
+    deadline: "2024-03-15",
+    target_amount: 12000,
+    current_amount: 12000
+  },
+  {
+    id: "5",
+    title: "Community Garden Initiative",
+    description: "Establishing community gardens on campus to promote sustainable agriculture and food security.",
+    status: "pending",
+    fundingGoal: 4000,
+    currentFunding: 1800,
+    imageUrl: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=600&q=80",
+    mediaUrls: ["https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=600&q=80"],
+    category: "Environment",
+    createdAt: "2024-02-20",
+    updatedAt: "2024-02-22",
+    walletAddress: "GJKL555566667777888899990000111122223333",
+    studentAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80",
+    studentName: "Emma Wilson",
+    university: "University of Washington",
+    tags: ["Agriculture", "Community", "Sustainability"],
+    githubUrl: "https://github.com/emmaw/garden-project",
+    linkedinUrl: "https://linkedin.com/in/emmawilson",
+    twitterUrl: "https://twitter.com/emmaw",
+    objectives: "Create sustainable food sources for campus community",
+    deliverables: "Three community gardens with irrigation systems",
+    deadline: "2024-07-10",
+    target_amount: 4000,
+    current_amount: 1800
+  },
+  {
+    id: "6",
+    title: "Student Entrepreneurship Hub",
+    description: "A co-working space and mentorship program for student entrepreneurs to develop their business ideas.",
+    status: "approved",
+    fundingGoal: 20000,
+    currentFunding: 8500,
+    imageUrl: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=80",
+    mediaUrls: ["https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=80"],
+    category: "Business",
+    createdAt: "2024-01-05",
+    updatedAt: "2024-01-15",
+    walletAddress: "GMNO999900001111222233334444555566667777",
+    studentAvatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80",
+    studentName: "James Thompson",
+    university: "NYU",
+    tags: ["Entrepreneurship", "Business", "Innovation"],
+    githubUrl: "https://github.com/jamest/startup-hub",
+    linkedinUrl: "https://linkedin.com/in/jamesthompson",
+    twitterUrl: "https://twitter.com/jamest",
+    objectives: "Support 50+ student startups annually",
+    deliverables: "Co-working space with mentorship programs",
+    deadline: "2024-09-30",
+    target_amount: 20000,
+    current_amount: 8500
+  }
+];
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -49,11 +206,10 @@ const containerVariants = {
 };
 
 const ProjectsPage = () => {
-  const navigate = useNavigate();
   const { showLoader, hideLoader } = useLoader();
-  const [allProjects, setAllProjects] = useState<Project[]>([]);
+  const [allProjects, setAllProjects] = useState<Project[]>(mockProjects);
   const [myProjects, setMyProjects] = useState<Project[]>([]);
-  const [publicProjects, setPublicProjects] = useState<Project[]>([]);
+  const [publicProjects, setPublicProjects] = useState<Project[]>(mockProjects);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
@@ -63,41 +219,20 @@ const ProjectsPage = () => {
   const [sortBy, setSortBy] = useState<string>("recent");
   const [search, setSearch] = useState<string>("");
 
-  // Check if user is logged in
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      toast.error("You must be logged in to view your projects");
-      navigate("/login");
-    }
-  }, [navigate]);
-
   // Fetch user's wallet address
   useEffect(() => {
     const wallet = localStorage.getItem("wallet_address");
     if (wallet) setWalletAddress(wallet);
   }, []);
 
-  // Fetch all projects
+  // Load projects on component mount
   useEffect(() => {
     showLoader("Loading Projects...");
-    const fetchProjects = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await fetch("http://studybae.online:8000/api/projects", {
-          method: "GET",
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (!response.ok) throw new Error("Failed to fetch projects");
-        const data = await response.json();
-        setAllProjects(data);
-      } catch (error) {
-        setAllProjects([]);
-      } finally {
-        hideLoader();
-      }
-    };
-    fetchProjects();
+    // Simulate API call delay
+    setTimeout(() => {
+      setAllProjects(mockProjects);
+      hideLoader();
+    }, 1000);
   }, [hideLoader, showLoader]);
 
   // Split projects into "My Projects" and "Public Projects"

@@ -4,8 +4,20 @@ import { Button } from "../components/ui/button";
 // import MainLayout from "../components/layout/MainLayout";
 import { ArrowRight, Code, Globe, Lightbulb, Linkedin, Lock, MessageCircle, Star, Twitter, Users } from "lucide-react";
 import PageWrapper from "../components/PageWrapper";
+import { useLoader } from "../context/LoaderContext";
+import { useEffect } from "react";
 
 const About = () => {
+  const { showLoader, hideLoader } = useLoader();
+
+  useEffect(() => {
+    showLoader("Loading About Page...");
+    // Simulate loading time
+    setTimeout(() => {
+      hideLoader();
+    }, 1500);
+  }, [showLoader, hideLoader]);
+
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
     visible: {

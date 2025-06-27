@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import PageWrapper from "../components/PageWrapper";
 import { Button } from "../components/ui/button";
 import CountUp from "react-countup";

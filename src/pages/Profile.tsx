@@ -1,8 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
-import { Edit, Github, Linkedin, Loader2, LogOut, Share, Twitter } from "lucide-react";
+import { Edit, Github, Linkedin, LogOut, Share, Twitter } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import * as z from "zod";
 import NewProjectModal from "../components/NewProjectModal";
 import PageWrapper from "../components/PageWrapper";
@@ -15,6 +16,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "../components/ui/input";
 import { useToast } from "../hooks/use-toast";
 import { useLoader } from "../context/LoaderContext";
+import { useAuth } from "../context/AuthContext";
 
 
 
@@ -180,6 +182,8 @@ const PLACEHOLDER_PROJECT: Project = {
 const Profile = () => {
   const { toast } = useToast();
   const { showLoader, hideLoader } = useLoader();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
   const [user, setUser] = useState(mockUserData);
   const [isEditing, setIsEditing] = useState(false);
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
@@ -250,11 +254,22 @@ const Profile = () => {
 
   // Handler for logout action
   const handleLogout = () => {
-    // In a real app, this would clear the authentication state
+    // Clear authentication state
+    logout();
+    
+    // Clear localStorage
+    localStorage.removeItem('token');
+    localStorage.removeItem('wallet_address');
+    localStorage.removeItem('user_role');
+    
+    // Show success message
     toast({
       title: "Logged out",
       description: "You have been logged out successfully.",
     });
+    
+    // Redirect to login page
+    navigate("/login");
   };
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

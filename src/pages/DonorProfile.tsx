@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
-import { Edit, Github, Linkedin, Loader2, LogOut, Share, Twitter } from "lucide-react";
+import { Edit, Github, Linkedin, LogOut, Share, Twitter } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";

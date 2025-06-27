@@ -16,7 +16,7 @@ const DonorLogin: React.FC = () => {
   const { login } = useAuth();
   const [form, setForm] = useState({ identifier: "", password: "" });
   const [error] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [shake, setShake] = useState(false);
   const { toast } = useToast();
