@@ -10,6 +10,8 @@ import Dashboard from "./pages/Dashboard";
 import Projects from "./pages/Projects";
 import Donations from "./pages/Donations";
 import Profile from "./pages/Profile";
+
+
 import DashboardD from "./pages/DashboardD";
 import DonorNavBar from "./components/DonorNavBar";
 import Donate from "./pages/Donate";
@@ -40,7 +42,7 @@ function App() {
           </Router>
         </LoaderProvider>
       </ThemeProvider>
-    </AuthProvider>
+ </AuthProvider>
   );
 }
 
