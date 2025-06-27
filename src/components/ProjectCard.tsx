@@ -105,7 +105,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
       whileHover={{ y: -5, transition: { duration: 0.2 } }}
     >
       <Card 
-        className="project-card h-full flex flex-col cursor-pointer shadow-sm hover:shadow-md dark:shadow-gray-900/20 dark:bg-gray-800/80 dark:border-gray-700" 
+        className="project-card h-full flex flex-col cursor-pointer shadow-sm hover:shadow-lg dark:shadow-gray-900/20 dark:bg-gray-800/80 dark:border-gray-700 rounded-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 group"
         onClick={onClick}
       >
         {/* Card Header */}
@@ -130,7 +130,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
         </div>
         
         {/* Media Content - Fixed aspect ratio for consistent height */}
-        <div className="aspect-video w-full relative overflow-hidden bg-gray-100 dark:bg-gray-800">
+        <div className="aspect-video w-full relative overflow-hidden bg-gray-100 dark:bg-gray-800 rounded-t-xl">
           {imageUrl ? (
             <img 
               src={imageUrl} 
@@ -145,7 +145,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
           )}
           
           {/* Overlay with view button */}
-          <div className="absolute inset-0 bg-black bg-opacity-0 flex items-center justify-center opacity-0 transition-all group-hover:bg-opacity-30 hover:bg-opacity-30 hover:opacity-100">
+          <div className="absolute inset-0 bg-black bg-opacity-0 flex items-center justify-center opacity-0 group-hover:bg-opacity-30 group-hover:opacity-100 transition-all duration-300">
             <Button variant="secondary" size="sm" className="bg-white/90 text-gray-800 hover:bg-white dark:bg-gray-800/90 dark:text-gray-100 dark:hover:bg-gray-800 shadow-md rounded-full">
               <Eye className="h-4 w-4 mr-1" /> View Details
             </Button>
@@ -154,7 +154,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
         
         {/* Project Info - Fixed height content for consistency */}
         <div className="p-4 flex-grow flex flex-col min-h-[150px]">
-          <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1 line-clamp-1">{projectName}</h3>
+          <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1 line-clamp-1 text-base sm:text-lg">{projectName}</h3>
           
           <p className="text-sm text-gray-700 dark:text-gray-300 mb-3 line-clamp-2">
             {description}
@@ -166,7 +166,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
               {tags.map((tag, index) => (
                 <span 
                   key={index} 
-                  className={cn("text-2xs px-2 py-0.5 rounded-full", getTagColor(tag))}
+                  className={cn("text-2xs px-2 py-0.5 rounded-full font-medium", getTagColor(tag))}
                 >
                   {tag}
                 </span>
@@ -176,32 +176,35 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
           
           {/* Funding Progress Bar */}
           <Tooltip.Provider>
-  <Tooltip.Root>
-    <Tooltip.Trigger asChild>
-      <div className="relative w-full cursor-pointer group">
-        <div className="w-full h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-blue-500 rounded-full transition-all duration-300"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      </div>
-    </Tooltip.Trigger>
-    <Tooltip.Portal>
-      <Tooltip.Content
-        side="top"
-        align="center"
-        className="px-2 py-1 bg-gray-900 text-white text-xs rounded shadow-lg z-50"
-        sideOffset={6}
-      >
-        {fundingCurrent && fundingTarget
-          ? `${fundingCurrent} / ${fundingTarget} XLM`
-          : "No funding data"}
-        <Tooltip.Arrow className="fill-gray-900" />
-      </Tooltip.Content>
-    </Tooltip.Portal>
-  </Tooltip.Root>
-</Tooltip.Provider>
+            <Tooltip.Root>
+              <Tooltip.Trigger asChild>
+                <div className="relative w-full cursor-pointer group mt-2">
+                  <div className="w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <motion.div
+                      className="h-full bg-blue-500 rounded-full transition-all duration-500"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${progress}%` }}
+                      transition={{ duration: 0.5 }}
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                </div>
+              </Tooltip.Trigger>
+              <Tooltip.Portal>
+                <Tooltip.Content
+                  side="top"
+                  align="center"
+                  className="px-2 py-1 bg-gray-900 text-white text-xs rounded shadow-lg z-50"
+                  sideOffset={6}
+                >
+                  {fundingCurrent && fundingTarget
+                    ? `${fundingCurrent} / ${fundingTarget} XLM`
+                    : "No funding data"}
+                  <Tooltip.Arrow className="fill-gray-900" />
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            </Tooltip.Root>
+          </Tooltip.Provider>
 
           {/* Action Buttons */}
           <div className="mt-auto flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-3">

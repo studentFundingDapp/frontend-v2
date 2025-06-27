@@ -7,6 +7,14 @@ import ProjectCard from "../components/ProjectCard";
 import ProjectDetailsModal from "../components/ProjectDetailsModal";
 import { Button } from "../components/ui/button";
 import { useLoader } from "../context/LoaderContext";
+import PageWrapper from "../components/PageWrapper";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue
+} from "../components/ui/select";
 
 // Types for project data based on API specs
 export interface Project {
@@ -314,202 +322,225 @@ const ProjectsPage = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6 sm:py-8 min-h-screen bg-white dark:bg-gray-900">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 sm:mb-8">
-        <motion.h1 
-          className="text-2xl sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-900 dark:from-blue-400 dark:to-blue-600"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          My Projects
-        </motion.h1>
-        <motion.div
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-        >
-          <Button 
-            onClick={() => setIsNewProjectModalOpen(true)}
-            className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white rounded-full px-6 shadow-sm"
+    <PageWrapper>
+      <div className="container mx-auto px-4 py-6 sm:py-8 min-h-screen bg-white dark:bg-gray-900">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 sm:mb-8">
+          <motion.h1 
+            className="text-2xl sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-900 dark:from-blue-400 dark:to-blue-600"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
           >
-            <Plus className="mr-2 h-4 w-4" /> Create New Project
-          </Button>
-        </motion.div>
-      </div>
-
-      {/* Filter & Sort Controls */}
-      <div className="flex flex-wrap gap-4 mb-6">
-        <input
-          type="text"
-          placeholder="Search projects..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="border rounded px-3 py-2"
-        />
-        <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
-          <option value="all">All Categories</option>
-          <option value="Medical">Medical</option>
-          <option value="Technology">Technology</option>
-          <option value="Business">Business</option>
-          <option value="Environment">Environment</option>
-          <option value="Education">Education</option>
-        </select>
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
-          <option value="all">All Statuses</option>
-          <option value="pending">Pending</option>
-          <option value="approved">Approved</option>
-          <option value="completed">Completed</option>
-          <option value="rejected">Rejected</option>
-        </select>
-        <select value={sortBy} onChange={e => setSortBy(e.target.value)}>
-          <option value="recent">Most Recent</option>
-          <option value="amount">Amount Raised</option>
-          <option value="deadline">Deadline</option>
-        </select>
-      </div>
-
-      {/* My Projects Section */}
-      <section className="mb-10">
-        {filteredMyProjects.length === 0 ? (
-          <motion.div 
-            className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
+            My Projects
+          </motion.h1>
+          <motion.div
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
           >
-            <h3 className="text-xl font-medium mb-2 text-gray-800 dark:text-gray-200">No projects yet</h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">Create your first project to get started</p>
             <Button 
               onClick={() => setIsNewProjectModalOpen(true)}
-              variant="outline"
-              className="bg-white dark:bg-gray-900"
+              className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white rounded-full px-6 shadow-sm"
             >
-              <Plus className="mr-2 h-4 w-4" /> Create Project
+              <Plus className="mr-2 h-4 w-4" /> Create New Project
             </Button>
           </motion.div>
-        ) : (
-          <>
-            <motion.div 
-              className="grid gap-4 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              {filteredMyProjects.map((project) => (
-                <motion.div key={project.id} variants={containerVariants}>
-                  <ProjectCard
-                    projectName={project.title}
-                    description={project.description}
-                    imageUrl={project.imageUrl}
-                    timestamp={new Date(project.createdAt).toLocaleDateString()}
-                    location={undefined}
-                    tags={[project.category, project.status]}
-                    likesCount={Math.floor(Math.random() * 50)}
-                    student={{
-                      name: "You",
-                      degree: "Student",
-                      university: "",
-                      avatarUrl: ""
-                    }}
-                    buttonText="View Details"
-                    onClick={() => handleOpenProjectDetails(project)}
-                    fundingCurrent={project.currentFunding}
-                    fundingTarget={project.fundingGoal}
-                  />
-                  <Button
-                    variant="destructive"
-                    className="mt-2"
-                    onClick={() => handleDeleteProject(project.id)}
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" /> Delete
-                  </Button>
-                </motion.div>
-              ))}
-            </motion.div>
-          </>
-        )}
-      </section>
+        </div>
 
-      {/* Public Projects Section */}
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-        className="bg-white dark:bg-gray-900"
-      >
-        <h2 className="text-xl sm:text-2xl font-semibold mb-6 text-gray-900 dark:text-gray-100">Explore Other Projects</h2>
-        
-        {filteredPublicProjects.length === 0 ? (
-          <motion.div 
-            className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200">No public projects available</h3>
-            <p className="text-gray-600 dark:text-gray-400">Check back later for updates</p>
-          </motion.div>
-        ) : (
-          <>
-            <motion.div 
-              className="grid gap-4 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              {filteredPublicProjects.map((project) => (
-                <motion.div key={project.id} variants={containerVariants}>
-                  <ProjectCard
-                    projectName={project.title}
-                    description={project.description}
-                    imageUrl={project.imageUrl}
-                    timestamp={new Date(project.createdAt).toLocaleDateString()}
-                    location={undefined}
-                    tags={[project.category, project.status]}
-                    likesCount={Math.floor(Math.random() * 100)}
-                    student={{
-                      name: "Student",
-                      degree: "Student",
-                      university: "",
-                      avatarUrl: ""
-                    }}
-                    buttonText="View Details"
-                    onClick={() => handleOpenProjectDetails(project)}
-                    fundingCurrent={project.currentFunding}
-                    fundingTarget={project.fundingGoal}
-                  />
-                </motion.div>
-              ))}
-            </motion.div>
-          </>
-        )}
-      </motion.div>
-
-      {/* New Project Modal */}
-      <AnimatePresence>
-        {isNewProjectModalOpen && (
-          <NewProjectModal
-            isOpen={isNewProjectModalOpen}
-            onClose={() => setIsNewProjectModalOpen(false)}
-            onProjectCreated={(project) => {
-              setAllProjects(prev => [project, ...prev]);
-              toast.success("Project created successfully");
-            }}
-            defaultWalletAddress={walletAddress}
+        {/* Filter & Sort Controls - refined as a column with professional Select dropdowns */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-6 w-full max-w-2xl">
+          <input
+            type="text"
+            placeholder="Search projects..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="border rounded px-3 py-2 w-full sm:w-auto"
           />
-        )}
-      </AnimatePresence>
+          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <SelectTrigger className="w-full sm:w-48">
+              <SelectValue placeholder="Category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Categories</SelectItem>
+              <SelectItem value="Medical">Medical</SelectItem>
+              <SelectItem value="Technology">Technology</SelectItem>
+              <SelectItem value="Business">Business</SelectItem>
+              <SelectItem value="Environment">Environment</SelectItem>
+              <SelectItem value="Education">Education</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full sm:w-48">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="approved">Approved</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="rejected">Rejected</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="w-full sm:w-48">
+              <SelectValue placeholder="Sort By" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="recent">Most Recent</SelectItem>
+              <SelectItem value="amount">Amount Raised</SelectItem>
+              <SelectItem value="deadline">Deadline</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-      {/* Project Details Modal */}
-      <AnimatePresence>
-        {isDetailsModalOpen && selectedProject && (
-          <ProjectDetailsModal
-            project={selectedProject}
-            isOpen={isDetailsModalOpen}
-            onClose={() => setIsDetailsModalOpen(false)}
-          />
-        )}
-      </AnimatePresence>
-    </div>
+        {/* My Projects Section */}
+        <section className="mb-10">
+          {filteredMyProjects.length === 0 ? (
+            <motion.div 
+              className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              <h3 className="text-xl font-medium mb-2 text-gray-800 dark:text-gray-200">No projects yet</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">Create your first project to get started</p>
+              <Button 
+                onClick={() => setIsNewProjectModalOpen(true)}
+                variant="outline"
+                className="bg-white dark:bg-gray-900"
+              >
+                <Plus className="mr-2 h-4 w-4" /> Create Project
+              </Button>
+            </motion.div>
+          ) : (
+            <>
+              <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+                  {filteredMyProjects.map((project) => (
+                    <motion.div
+                      key={project.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="h-full"
+                    >
+                      <ProjectCard
+                        projectName={project.title}
+                        description={project.description}
+                        imageUrl={project.imageUrl}
+                        timestamp={new Date(project.createdAt).toLocaleDateString()}
+                        location={undefined}
+                        tags={[project.category, project.status]}
+                        likesCount={Math.floor(Math.random() * 50)}
+                        student={{
+                          name: "You",
+                          degree: "Student",
+                          university: "",
+                          avatarUrl: ""
+                        }}
+                        buttonText="View Details"
+                        onClick={() => handleOpenProjectDetails(project)}
+                        fundingCurrent={project.currentFunding}
+                        fundingTarget={project.fundingGoal}
+                      />
+                      <Button
+                        variant="destructive"
+                        className="mt-2"
+                        onClick={() => handleDeleteProject(project.id)}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" /> Delete
+                      </Button>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+        </section>
+
+        {/* Public Projects Section */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="bg-white dark:bg-gray-900"
+        >
+          <h2 className="text-xl sm:text-2xl font-semibold mb-6 text-gray-900 dark:text-gray-100">Explore Other Projects</h2>
+          
+          {filteredPublicProjects.length === 0 ? (
+            <motion.div 
+              className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200">No public projects available</h3>
+              <p className="text-gray-600 dark:text-gray-400">Check back later for updates</p>
+            </motion.div>
+          ) : (
+            <>
+              <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+                  {filteredPublicProjects.map((project) => (
+                    <motion.div
+                      key={project.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="h-full"
+                    >
+                      <ProjectCard
+                        projectName={project.title}
+                        description={project.description}
+                        imageUrl={project.imageUrl}
+                        timestamp={new Date(project.createdAt).toLocaleDateString()}
+                        location={undefined}
+                        tags={[project.category, project.status]}
+                        likesCount={Math.floor(Math.random() * 100)}
+                        student={{
+                          name: "Student",
+                          degree: "Student",
+                          university: "",
+                          avatarUrl: ""
+                        }}
+                        buttonText="View Details"
+                        onClick={() => handleOpenProjectDetails(project)}
+                        fundingCurrent={project.currentFunding}
+                        fundingTarget={project.fundingGoal}
+                      />
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+        </motion.div>
+
+        {/* New Project Modal */}
+        <AnimatePresence>
+          {isNewProjectModalOpen && (
+            <NewProjectModal
+              isOpen={isNewProjectModalOpen}
+              onClose={() => setIsNewProjectModalOpen(false)}
+              onProjectCreated={(project) => {
+                setAllProjects(prev => [project, ...prev]);
+                toast.success("Project created successfully");
+              }}
+              defaultWalletAddress={walletAddress}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* Project Details Modal */}
+        <AnimatePresence>
+          {isDetailsModalOpen && selectedProject && (
+            <ProjectDetailsModal
+              project={selectedProject}
+              isOpen={isDetailsModalOpen}
+              onClose={() => setIsDetailsModalOpen(false)}
+            />
+          )}
+        </AnimatePresence>
+      </div>
+    </PageWrapper>
   );
 };
 

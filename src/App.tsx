@@ -49,49 +49,55 @@ function App() {
 function AppContent() {
   const { show, message } = useLoader();
   const location = useLocation();
+  const { user } = useAuth();
 
   const authPages = ["/login", "/student-login", "/student-signup", "/donor-login", "/donor-signup"];
-  const donorRoutes = ["/dashboard-d", "/donate", "/students", "/about", "/profile-d"];
-  const isDonorPage = donorRoutes.includes(location.pathname);
   const isAuthPage = authPages.includes(location.pathname);
-
   const isNotFound = ["/404", "/not-found", "*", "/404.html"].includes(location.pathname);
+
+  // Determine role for NavBar
+  let navRole = "default";
+  if (user?.role === "donor") navRole = "donor";
+  else if (user?.role === "student") navRole = "student";
+  else if (user?.role === "admin") navRole = "admin";
 
   return (
     <>
       <Loader show={show} message={message} />
       <div className="flex flex-col min-h-screen">
-        {!isNotFound && !isAuthPage && (isDonorPage ? <DonorNavBar /> : <NavBar />)}
+        {!isNotFound && !isAuthPage && <NavBar role={navRole as import("./components/NavBar").NavBarRole} />}
         <div className="flex-grow">
-          <Routes>
-            {/* Auth & Role Selection */}
-            <Route path="/login" element={<RoleSelectionLanding />} />
-            <Route path="/student-signup" element={<StudentSignUp />} />
-            <Route path="/student-login" element={<StudentLogin />} />
-            <Route path="/donor-signup" element={<DonorSignUp />} />
-            <Route path="/donor-login" element={<DonorLogin />} />
+          <div className="pt-16">
+            <Routes>
+              {/* Auth & Role Selection */}
+              <Route path="/login" element={<RoleSelectionLanding />} />
+              <Route path="/student-signup" element={<StudentSignUp />} />
+              <Route path="/student-login" element={<StudentLogin />} />
+              <Route path="/donor-signup" element={<DonorSignUp />} />
+              <Route path="/donor-login" element={<DonorLogin />} />
 
-            {/* Public Routes */}
-            <Route path="/about" element={<About />} />
+              {/* Public Routes */}
+              <Route path="/about" element={<About />} />
 
-            {/* Donor Routes (no auth protection, add if needed) */}
-            <Route path="/dashboard-d" element={<DashboardD />} />
-            <Route path="/donate" element={<Donate />} />
-            <Route path="/students" element={<ExploreStudents />} />
-            <Route path="/profile-d" element={<DonorProfile />} />
+              {/* Donor Routes (no auth protection, add if needed) */}
+              <Route path="/dashboard-d" element={<DashboardD />} />
+              <Route path="/donate" element={<Donate />} />
+              <Route path="/students" element={<ExploreStudents />} />
+              <Route path="/profile-d" element={<DonorProfile />} />
 
-            {/* Private Routes */}
-            <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-            <Route path="/projects" element={<PrivateRoute><Projects /></PrivateRoute>} />
-            <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
-            <Route path="/donations" element={<PrivateRoute><Donations /></PrivateRoute>} />
+              {/* Private Routes */}
+              <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+              <Route path="/projects" element={<PrivateRoute><Projects /></PrivateRoute>} />
+              <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+              <Route path="/donations" element={<PrivateRoute><Donations /></PrivateRoute>} />
 
-            {/* Redirect root to login */}
-            <Route path="/" element={<Navigate to="/login" replace />} />
+              {/* Redirect root to login */}
+              <Route path="/" element={<Navigate to="/login" replace />} />
 
-            {/* Catch-all route */}
-            <Route path="*" element={<Navigate to="/login" replace />} />
-          </Routes>
+              {/* Catch-all route */}
+              <Route path="*" element={<Navigate to="/login" replace />} />
+            </Routes>
+          </div>
         </div>
         {!isNotFound && !isAuthPage && <Footer />}
         {isNotFound && <AuthFooter />}

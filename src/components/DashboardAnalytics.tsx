@@ -5,6 +5,7 @@ import {
   ChartTooltipContent
 } from "../components/ui/chart";
 import { BarChart, Bar, XAxis, ResponsiveContainer } from "recharts";
+import { motion } from "framer-motion";
 
 interface AnalyticsProps {
   totalFunded: string;
@@ -36,29 +37,34 @@ const DashboardAnalytics: React.FC<AnalyticsProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
-      <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-6">Funding Overview</h2>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className=""
+    >
+      <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4 sm:mb-6">Funding Overview</h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/30 rounded-lg p-4">
-          <p className="text-blue-600 dark:text-blue-400 text-sm font-medium">Total Funded</p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{totalFunded} XLM</p>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 mb-6 sm:mb-8">
+        <motion.div whileHover={{ scale: 1.03, boxShadow: '0 4px 24px rgba(59,130,246,0.08)' }} className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/30 rounded-lg p-3 sm:p-4 transition-all duration-300 w-full">
+          <p className="text-blue-600 dark:text-blue-400 text-xs sm:text-sm font-medium">Total Funded</p>
+          <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mt-1">{totalFunded} XLM</p>
+        </motion.div>
         
-        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-100 dark:border-yellow-900/30 rounded-lg p-4">
-          <p className="text-yellow-600 dark:text-yellow-400 text-sm font-medium">Pending Payouts</p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{pendingPayouts} XLM</p>
-        </div>
+        <motion.div whileHover={{ scale: 1.03, boxShadow: '0 4px 24px rgba(251,191,36,0.08)' }} className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-100 dark:border-yellow-900/30 rounded-lg p-3 sm:p-4 transition-all duration-300 w-full">
+          <p className="text-yellow-600 dark:text-yellow-400 text-xs sm:text-sm font-medium">Pending Payouts</p>
+          <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mt-1">{pendingPayouts} XLM</p>
+        </motion.div>
         
-        <div className="bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-900/30 rounded-lg p-4">
-          <p className="text-green-600 dark:text-green-400 text-sm font-medium">Available Balance</p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{availableBalance} XLM</p>
-        </div>
+        <motion.div whileHover={{ scale: 1.03, boxShadow: '0 4px 24px rgba(16,185,129,0.08)' }} className="bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-900/30 rounded-lg p-3 sm:p-4 transition-all duration-300 w-full">
+          <p className="text-green-600 dark:text-green-400 text-xs sm:text-sm font-medium">Available Balance</p>
+          <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mt-1">{availableBalance} XLM</p>
+        </motion.div>
       </div>
       
       <div>
-        <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-4">Transaction History</h3>
-        <div className="h-64">
+        <h3 className="text-base sm:text-lg font-medium text-gray-800 dark:text-white mb-2 sm:mb-4">Transaction History</h3>
+        <div className="h-48 sm:h-64">
           <ChartContainer
             config={chartConfig}
             className="h-full w-full"
@@ -94,7 +100,7 @@ const DashboardAnalytics: React.FC<AnalyticsProps> = ({
           </ChartContainer>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
