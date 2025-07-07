@@ -13,7 +13,6 @@ import Profile from "./pages/Profile";
 
 
 import DashboardD from "./pages/DashboardD";
-import DonorNavBar from "./components/DonorNavBar";
 import Donate from "./pages/Donate";
 import ExploreStudents from "./pages/ExploreStudents";
 import DonorProfile from "./pages/DonorProfile";
