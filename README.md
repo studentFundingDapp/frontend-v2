@@ -1,6 +1,7 @@
 # DSFS – Decentralized Student Funding System
 
-DSFS is a digital donation platform focused on transparency, community, and impact, specifically designed to fund student-led projects or support student needs—such as tuition, innovation, or community-driven ideas. Unlike traditional crowdfunding platforms, DSFS leverages decentralization and aims to integrate blockchain principles and community validation mechanisms for trustless, transparent giving.
+DSFS is a digital donation platform focused on transparency, community, and impact, specifically designed to fund student-led projects or support student needs—such as tuition, innovation, or community-driven ideas. Unlike traditional crowdfunding platforms, DSFS leverages decentralization and aims to integrate blockchain principles and community validation mechanisms for trustless, transparent giving.It enables peer-to-peer student funding using the Stellar blockchain. Built with a fullstack architecture, it allows students to receive donations, manage their wallet, and track funding activity.
+
 
 ---
 
@@ -26,7 +27,7 @@ DSFS is a digital donation platform focused on transparency, community, and impa
 - **Decentralized Principles:** Designed to integrate blockchain for transparent, tamper-proof records and decentralized validation.
 - **User Dashboard:** Personalized dashboard for students and donors to manage projects, donations, and profiles.
 - **Project Analytics:** Real-time analytics and progress tracking for each project.
-- **Secure Wallet Integration:** Connect and manage crypto wallets for decentralized donations.
+- **Secure Wallet Integration:** Connect and manage Stellar crypto wallets(Freighter) for decentralized donations.- Features like send, receive, and withdraw are stubbed and ready for future implementation.
 - **Responsive UI:** Modern, accessible, and mobile-friendly interface.
 
 ---
@@ -69,7 +70,10 @@ dsfs/
 
 ```bash
 git clone https://github.com/.......git
-cd dsfs
+
+
+###Install Dependedncies
+cd frontend
 npm install
 
 ### Running the App
