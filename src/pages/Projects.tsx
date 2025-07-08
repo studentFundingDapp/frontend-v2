@@ -205,14 +205,6 @@ const mockProjects: Project[] = [
   }
 ];
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.08 }
-  }
-};
-
 const ProjectsPage = () => {
   const { showLoader, hideLoader } = useLoader();
   const [allProjects, setAllProjects] = useState<Project[]>(mockProjects);
@@ -236,6 +228,25 @@ const ProjectsPage = () => {
   // Load projects on component mount
   useEffect(() => {
     showLoader("Loading Projects...");
+
+    // In a real application, replace this with an actual API call
+   /* useEffect(() => {
+  showLoader("Loading Projects...");
+  fetch("http://studybae.online:8000/api/projects", {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+    .then(res => res.json())
+    .then(data => {
+      setAllProjects(data.projects); // adjust based on backend response shape
+      hideLoader();
+    })
+    .catch(() => {
+      toast.error("Failed to fetch projects");
+      hideLoader();
+    });
+}, []);
+
+    */
     // Simulate API call delay
     setTimeout(() => {
       setAllProjects(mockProjects);

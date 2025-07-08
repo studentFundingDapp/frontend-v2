@@ -1,19 +1,18 @@
+import { motion } from "framer-motion";
+import { ArrowLeft, Check, CheckCircle, Loader2, XCircle } from "lucide-react";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthAsideCarousel from "../components/AuthAsideCarousel";
 import AuthFormWrapper from "../components/AuthFormWrapper";
-import { useAuth } from "../context/AuthContext";
-import { ArrowLeft } from "lucide-react";
-import { motion } from "framer-motion";
-import FloatingLabelInput from "../components/ui/floating-label-input";
-import { Check, Loader2, XCircle, CheckCircle } from "lucide-react";
-import { useToast } from "../hooks/use-toast";
 import Loader from "../components/Loader";
+import FloatingLabelInput from "../components/ui/floating-label-input";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../hooks/use-toast";
 
 const StudentLogin: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const [form, setForm] = useState({ username: "", password: "" });
+  const [form, setForm] = useState({ email: "", password: "" });
   const [error] = useState<string | null>(null);
   const [loading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -25,10 +24,10 @@ const StudentLogin: React.FC = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSuccess(false);
-    if (!form.username || !form.password) {
+    if (!form.email || !form.password) {
       setShake(true);
       setTimeout(() => setShake(false), 600);
       setTimeout(() => {
@@ -41,9 +40,11 @@ const StudentLogin: React.FC = () => {
       }, 800);
       return;
     }
+    try{
     // Show loader for smooth transition
     setShowLoader(true);
-    login(form.username, "testnet", "student");
+    await login(form.email, form.password,"student");
+
     toast({
       title: "Login successful!",
       description: "Welcome back.",
@@ -54,6 +55,16 @@ const StudentLogin: React.FC = () => {
       setShowLoader(false);
       navigate("/dashboard");
     }, 1200);
+  }catch (err:any) {
+   console.error("Login failed:", err);
+    setShowLoader(false);
+    toast({
+      title: "Login failed!",
+      description: err.message || "Invalid credentials. Please try again.",
+      variant: "destructive",
+     }); 
+     setShowLoader(false);
+    }
   };
 
   return (
@@ -88,7 +99,7 @@ const StudentLogin: React.FC = () => {
 
           <AuthFormWrapper title="Student Login">
             <form onSubmit={handleSubmit} className="w-full">
-              <FloatingLabelInput label="Username" name="username" type="text" required value={form.username} onChange={handleChange} />
+              <FloatingLabelInput label="Email" name="email" type="text" required value={form.email} onChange={handleChange} />
               <FloatingLabelInput label="Password" name="password" type="password" required value={form.password} onChange={handleChange} />
               {error && <div className="mb-4 p-2 bg-red-100 text-red-600 rounded text-center animate-pulse">{error}</div>}
               <motion.button

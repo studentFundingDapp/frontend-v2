@@ -5,7 +5,7 @@ import { useToast } from "../hooks/use-toast";
 import FloatingLabelInput from "../components/ui/floating-label-input";
 import AuthFormWrapper from "../components/AuthFormWrapper";
 import { motion } from "framer-motion";
-import { XCircle, CheckCircle, ArrowLeft } from "lucide-react";
+import { CheckCircle, ArrowLeft } from "lucide-react";
 
 const generateStellarKeypair = () => {
   // Placeholder: Replace with real keypair generation logic
@@ -20,7 +20,7 @@ const StudentSignUp: React.FC = () => {
   const [form, setForm] = useState({
     email: "",
     phone: "",
-    username: "",
+    fullname: "",
     password: "",
     walletAddress: "",
     walletSecret: "",
@@ -52,30 +52,56 @@ const StudentSignUp: React.FC = () => {
     setForm({ ...form, walletAddress: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.email || !form.phone || !form.username || !form.password || !form.walletAddress) {
-      setShake(true);
-      setTimeout(() => setShake(false), 600);
-      setTimeout(() => {
-        toast({
-          title: "Sign up failed!",
-          description: "Please fill in all required fields.",
-          variant: "destructive",
-          icon: <motion.span initial={{ x: -30, rotate: -20, scale: 0 }} animate={{ x: 0, rotate: 0, scale: 1 }} transition={{ type: 'spring', bounce: 0.6 }}><XCircle className="text-red-500" /></motion.span>
-        });
-      }, 800);
-      return;
-    }
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  // Frontend validation
+  if (!form.email || !form.phone || !form.fullname || !form.password) {
+    setShake(true);
+    setTimeout(() => setShake(false), 600);
     setTimeout(() => {
       toast({
+        title: "Sign up failed!",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      
+      });
+    }, 800);
+    return;
+  }
+
+  try {
+    const res = await fetch("https://your-backend/api/signup", {//API Navigation to be set with correct endpoint
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form)
+    });
+
+    if (!res.ok) {
+      const errData = await res.json();
+      throw new Error(errData.message || "Signup failed.");
+    }
+
+ toast({
         title: "Sign up successful!",
         description: "Welcome to DSFS.",
         variant: "default",
         icon: <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', bounce: 0.6 }}><CheckCircle className="text-green-500" /></motion.span>
       });
+
+    setTimeout(() => {
+      navigate("/student-login"); 
     }, 1500);
-  };
+
+  } catch (err: any) {
+    toast({
+      title: "Error",
+      description: err.message || "Something went wrong.",
+      variant: "destructive",
+    
+    });
+  }
+};
 
   return (
     <div className="h-screen flex bg-gradient-to-br from-indigo-700 via-blue-600 to-blue-400 dark:from-gray-950 dark:via-indigo-950 dark:to-blue-900 overflow-hidden">
@@ -106,37 +132,93 @@ const StudentSignUp: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <FloatingLabelInput label="Email" name="email" type="email" required value={form.email} onChange={handleChange} placeholder="Enter your email" />
               <FloatingLabelInput label="Phone Number" name="phone" type="tel" required value={form.phone} onChange={handleChange} placeholder="Enter your phone number" />
-              <FloatingLabelInput label="Username" name="username" type="text" required value={form.username} onChange={handleChange} placeholder="Choose a username" />
+              <FloatingLabelInput label="Fullname" name="fullname" type="text" required value={form.fullname} onChange={handleChange} placeholder="Choose a username" />
               <FloatingLabelInput label="Password" name="password" type="password" required value={form.password} onChange={handleChange} placeholder="Create a password" />
 
-              <div className="mb-4">
-                <label className="block mb-2 text-gray-700 dark:text-gray-200 font-medium">
-                  Stellar Wallet <span className="text-red-500">*</span>
-                </label>
-                {!showWallet && (
-                  <div className="flex gap-2">
-                    <button type="button" className="flex-1 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition" onClick={() => handleWalletMode("generate")}>Generate New</button>
-                    <button type="button" className="flex-1 py-2 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition" onClick={() => handleWalletMode("paste")}>Paste Existing</button>
-                  </div>
-                )}
-                {showWallet && form.walletMode === "generate" && generated && (
-                  <div className="mt-3 bg-indigo-50 dark:bg-indigo-900/30 p-3 rounded-lg">
-                    <div className="mb-2 text-xs text-gray-600 dark:text-gray-300">Public Key:</div>
-                    <div className="font-mono text-xs break-all mb-2">{generated.publicKey}</div>
-                    <div className="mb-2 text-xs text-gray-600 dark:text-gray-300">Secret Key (save this!):</div>
-                    <div className="font-mono text-xs break-all mb-2">{generated.secret}</div>
-                    <div className="text-xs text-red-500 mb-2">Keep your secret key safe. Never share it.</div>
-                  </div>
-                )}
-                {showWallet && form.walletMode === "paste" && (
-                  <div className="mt-3">
-                    <input type="text" name="walletAddress" placeholder="Stellar Public Key" className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none" required onChange={handlePasteWallet} value={form.walletAddress} />
-                  </div>
-                )}
-                {showWallet && (
-                  <button type="button" className="mt-2 text-xs text-indigo-600 underline" onClick={() => { setShowWallet(false); setForm(f => ({ ...f, walletMode: "none", walletAddress: "", walletSecret: "" })); setGenerated(null); }}>Change Wallet Option</button>
-                )}
-              </div>
+       <div className="mb-4">
+  <label className="block mb-2 text-gray-700 dark:text-gray-200 font-medium">
+    Stellar Wallet <span className="text-red-500">*</span>
+  </label>
+  
+  {!showWallet && (
+    <div className="flex gap-2 flex-wrap">
+      <button
+        type="button"
+        className="flex-1 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition"
+        onClick={() => handleWalletMode("generate")}
+      >
+        Generate New
+      </button>
+      <button
+        type="button"
+        className="flex-1 py-2 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition"
+        onClick={() => handleWalletMode("paste")}
+      >
+        Paste Existing
+      </button>
+      <button
+        type="button"
+        className="flex-1 py-2 bg-gray text-gray-700 border border-gray-300 rounded-lg font-semibold hover:bg-gray-100 transition"
+        onClick={() => {
+          setShowWallet(false);
+          setForm(f => ({
+            ...f,
+            walletMode: "none",
+            walletAddress: "",
+            walletSecret: ""
+          }));
+          setGenerated(null);
+        }}
+      >
+        Skip for now
+      </button>
+    </div>
+  )}
+
+  {showWallet && form.walletMode === "generate" && generated && (
+    <div className="mt-3 bg-indigo-50 dark:bg-indigo-900/30 p-3 rounded-lg">
+      <div className="mb-2 text-xs text-gray-600 dark:text-gray-300">Public Key:</div>
+      <div className="font-mono text-xs break-all mb-2">{generated.publicKey}</div>
+      <div className="mb-2 text-xs text-gray-600 dark:text-gray-300">Secret Key (save this!):</div>
+      <div className="font-mono text-xs break-all mb-2">{generated.secret}</div>
+      <div className="text-xs text-red-500 mb-2">Keep your secret key safe. Never share it.</div>
+    </div>
+  )}
+
+  {showWallet && form.walletMode === "paste" && (
+    <div className="mt-3">
+      <input
+        type="text"
+        name="walletAddress"
+        placeholder="Stellar Public Key"
+        className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none"
+        onChange={handlePasteWallet}
+        value={form.walletAddress}
+        required={form.walletMode === "paste"}
+      />
+    </div>
+  )}
+
+  {showWallet && (
+    <button
+      type="button"
+      className="mt-2 text-xs text-indigo-600 underline"
+      onClick={() => {
+        setShowWallet(false);
+        setForm(f => ({
+          ...f,
+          walletMode: "none",
+          walletAddress: "",
+          walletSecret: ""
+        }));
+        setGenerated(null);
+      }}
+    >
+      Change Wallet Option
+    </button>
+  )}
+</div>
+
 
               {error && <div className="mb-4 p-2 bg-red-100 text-red-600 rounded text-center">{error}</div>}
 

@@ -4,7 +4,7 @@ import type { ProjectCardProps } from "../components/ProjectCard";
 import PageWrapper from "../components/PageWrapper";
 import { useLoader } from "../context/LoaderContext";
 
-// ✅ mockProjects should match ProjectCardProps
+//  mockProjects should match ProjectCardProps
 const mockProjects: ProjectCardProps[] = [
   {
     projectName: "Smart Irrigation System",

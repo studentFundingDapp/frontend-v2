@@ -4,7 +4,7 @@ import DashboardAnalytics from "../components/DashboardAnalytics";
 import PageWrapper from "../components/PageWrapper";
 import TransactionCard from "../components/TransactionCard";
 import { Button } from "../components/ui/button";
-import { getAccountBalance } from '../utils/stellar';
+//import { checkBalance } from '../lib/stellar';
 import { useAuth } from "../context/AuthContext";
 import { useLoader } from "../context/LoaderContext";
 import { toast } from "sonner";
@@ -28,7 +28,7 @@ export default function Index() {
 
   useEffect(() => {
     if (user?.publicKey) {
-      getAccountBalance(user.publicKey).then(setBalance);
+    //  checkBalance(user.publicKey).then(setBalance);
     }
   }, [user?.publicKey]);
 

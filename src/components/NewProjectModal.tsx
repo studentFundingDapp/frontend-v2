@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { cn } from "../lib/utils";
 import type { Project } from "../pages/Projects";
 import { Button } from "./ui/button";
-import { Calendar } from "./ui/calender";
+import { Calendar } from "./ui/calendar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
